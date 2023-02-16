@@ -63,6 +63,7 @@ namespace MusicManager
             this.tboxSrcFolder.Name = "tboxSrcFolder";
             this.tboxSrcFolder.Size = new System.Drawing.Size(418, 21);
             this.tboxSrcFolder.TabIndex = 1;
+            this.tboxSrcFolder.TextChanged += new System.EventHandler(this.tboxSrcFolder_TextChanged);
             // 
             // rtboxLog
             // 
@@ -119,6 +120,7 @@ namespace MusicManager
             this.tboxDupFolder.Name = "tboxDupFolder";
             this.tboxDupFolder.Size = new System.Drawing.Size(418, 21);
             this.tboxDupFolder.TabIndex = 1;
+            this.tboxDupFolder.TextChanged += new System.EventHandler(this.tboxDupFolder_TextChanged);
             // 
             // btnBrowseDupFolder
             // 
@@ -186,7 +188,7 @@ namespace MusicManager
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Music manager v0.1";
+            this.Text = "Music manager";
             this.ResumeLayout(false);
             this.PerformLayout();
 

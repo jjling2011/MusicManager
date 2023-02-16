@@ -16,6 +16,8 @@ namespace MusicManager
     {
         readonly string supportedMusicFormats = @"aa, aax, aac, aiff, ape, dsf, flac, m4a, m4b, m4p, mp3, mpc, mpp, ogg, oga, wav, wma, wv, webm";
 
+        const char pathSpliter = '|';
+
         CancellationTokenSource cts;
 
         Dictionary<string, bool> musicExtensions = new Dictionary<string, bool>();
@@ -23,6 +25,8 @@ namespace MusicManager
         public FormMain()
         {
             InitializeComponent();
+
+            this.Text = "Music manager v0.1.1";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -56,17 +60,37 @@ namespace MusicManager
             // var folder = tboxSrcFolder.Text;
             // dbg_getter_exts(folder);
         }
+        private void tboxSrcFolder_TextChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.srcFolder = tboxSrcFolder.Text;
+            Properties.Settings.Default.Save();
+        }
+
+        private void tboxDupFolder_TextChanged(object sender, EventArgs e)
+        {
+            Properties.Settings.Default.dupFolder = tboxDupFolder.Text;
+            Properties.Settings.Default.Save();
+        }
 
         private void btnBrowseSrcFolder_Click(object sender, EventArgs e)
         {
-            var path = Properties.Settings.Default.srcFolder;
-            var src = ShowBrowseFolderDialog(path);
-            if (!string.IsNullOrEmpty(src))
+            var src = Properties.Settings.Default.srcFolder;
+            var folders = SrcToFolders(src);
+
+            var folder = ShowBrowseFolderDialog(folders.LastOrDefault());
+            if (string.IsNullOrEmpty(folder))
             {
-                tboxSrcFolder.Text = src;
-                Properties.Settings.Default.srcFolder = src;
-                Properties.Settings.Default.Save();
+                return;
             }
+            if (!folders.Contains(folder))
+            {
+                folders.Add(folder);
+            }
+
+            src = FoldersToSrc(folders);
+            tboxSrcFolder.Text = src;
+            Properties.Settings.Default.srcFolder = src;
+            Properties.Settings.Default.Save();
         }
 
         private void btnBrowseDupFolder_Click(object sender, EventArgs e)
@@ -91,7 +115,7 @@ namespace MusicManager
 
             Task.Run(() =>
             {
-                RenameFolder(src, cts.Token);
+                RenameFolders(src, cts.Token);
                 ToggleBtnState(true);
             });
 
@@ -146,6 +170,20 @@ namespace MusicManager
         #endregion
 
         #region private
+        string FoldersToSrc(IEnumerable<string> folders)
+        {
+            var r = folders.Select(e => e.Trim()).Where(e => !string.IsNullOrWhiteSpace(e));
+            return string.Join($" {pathSpliter} ", r);
+        }
+
+        List<string> SrcToFolders(string src)
+        {
+            return src.Split(pathSpliter)
+                .Select(e => e.Trim())
+                .Where(e => !string.IsNullOrWhiteSpace(e))
+                .ToList();
+        }
+
         void Log(string content)
         {
             rtboxLog.Invoke((MethodInvoker)delegate
@@ -158,30 +196,36 @@ namespace MusicManager
 
         Dictionary<string, string> musics = new Dictionary<string, string>();
 
-        bool IsDupFile(string dup, string file)
+        string SearchForDupFile(string file)
         {
             TagLib.File mf = TagLib.File.Create(file);
-
             var key = mf.Tag.Title + string.Join(",", mf.Tag.Performers);
-            // Log($"[dbg] {key}");
 
             if (string.IsNullOrWhiteSpace(key))
             {
                 Log($"[empty] {file}");
-                return false;
+                return string.Empty;
             }
 
             if (!musics.ContainsKey(key))
             {
                 Log($"[new] {file}");
                 musics.Add(key, file);
-                return false;
+                return string.Empty;
             }
 
-            // dup
+            var dbFileTimestamp = new FileInfo(musics[key]).CreationTime;
+            var curFileTimestamp = new FileInfo(file).CreationTime;
+            if (dbFileTimestamp.CompareTo(curFileTimestamp) > 0)
+            {
+                var r = musics[key];
+                musics[key] = file;
+                Log($"[dup] {r} of {file}");
+                return r;
+            }
+
             Log($"[dup] {file} of {musics[key]}");
-            MoveFileToFolder(file, dup);
-            return true;
+            return file;
         }
 
         void MoveFileToFolder(string srcFile, string destFolder)
@@ -206,16 +250,17 @@ namespace MusicManager
             return filename;
         }
 
-        bool RenameFile(string file)
+        bool RenameFile(string src)
         {
-            var mf = TagLib.File.Create(file);
-            var folder = Path.GetDirectoryName(file);
-            var ext = Path.GetExtension(file);
+            var mf = TagLib.File.Create(src);
+            var folder = Path.GetDirectoryName(src);
+            var ext = Path.GetExtension(src);
             var artists = string.Join(",", mf.Tag.Performers);
             var title = mf.Tag.Title;
 
             if (string.IsNullOrWhiteSpace(ext) || string.IsNullOrWhiteSpace(artists) || string.IsNullOrWhiteSpace(title))
             {
+                Log($"[empt-tag] {src}");
                 return false;
             }
 
@@ -223,18 +268,21 @@ namespace MusicManager
             var f = RemoveIllegalFilenameChars(tf);
             var dest = Path.Combine(folder, f);
 
-            if (file == dest)
+            if (src == dest)
             {
+                Log($"[skip] {src}");
                 return false;
             }
-            Log($"[mv] {file} -> {dest}");
+
             if (File.Exists(dest))
             {
-                Log($"[rm] {file}");
-                File.Delete(file);
+                Log($"[rm] {src}");
+                File.Delete(src);
                 return false;
             }
-            File.Move(file, dest);
+
+            Log($"[mv] {src} -> {dest}");
+            File.Move(src, dest);
             return true;
         }
 
@@ -244,30 +292,36 @@ namespace MusicManager
             return musicExtensions.ContainsKey(ext);
         }
 
-        void RenameFolder(string folder, CancellationToken token)
+        void RenameFolders(string src, CancellationToken token)
         {
-            Log($"Rename folder: {folder}");
             var cMv = 0;
             var cSkip = 0;
             var cTotal = 0;
-            foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+
+            var folders = SrcToFolders(src);
+            foreach (var folder in folders)
             {
-                if (IsMusicFile(file))
+                Log($"Rename folder: {folder}");
+                foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
                 {
-                    cTotal++;
-                    if (RenameFile(file))
+                    if (token.IsCancellationRequested)
                     {
-                        cMv++;
+                        Log("Stop by user");
+                        Log($"Total: {cTotal}, Move: {cMv}, Skip: {cSkip}");
+                        return;
                     }
-                    else
+                    if (IsMusicFile(file))
                     {
-                        cSkip++;
+                        cTotal++;
+                        if (RenameFile(file))
+                        {
+                            cMv++;
+                        }
+                        else
+                        {
+                            cSkip++;
+                        }
                     }
-                }
-                if (token.IsCancellationRequested)
-                {
-                    Log("Stop by user");
-                    break;
                 }
             }
             Log($"Total: {cTotal}, Move: {cMv}, Skip: {cSkip}");
@@ -276,8 +330,7 @@ namespace MusicManager
         void DedupFolder(string src, string dup, CancellationToken token)
         {
             Log("Remove duplicate music files.");
-            Log($"Source folder: {src}");
-            Log($"Duplicate folder: {dup}");
+            Log($"Cache folder: {dup}");
 
             if (!Directory.Exists(dup))
             {
@@ -291,27 +344,36 @@ namespace MusicManager
             var cNew = 0;
             var cDup = 0;
             musics.Clear();
-            foreach (string file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories))
+
+            var folders = SrcToFolders(src);
+            foreach (var folder in folders)
             {
-                if (IsMusicFile(file))
+                Log($"Dedup folder: {folder}");
+                foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
                 {
-                    if (IsDupFile(dup, file))
+                    if (token.IsCancellationRequested)
                     {
-                        cDup++;
+                        Log("Stop by user");
+                        Log($"Total: {cDup + cNew}, New: {cNew}, Dup: {cDup}");
+                        return;
                     }
-                    else
+                    if (!IsMusicFile(file))
+                    {
+                        continue;
+                    }
+                    var dupFile = SearchForDupFile(file);
+                    if (string.IsNullOrWhiteSpace(dupFile))
                     {
                         cNew++;
+                        continue;
                     }
-                }
-                if (token.IsCancellationRequested)
-                {
-                    Log("Stop by user");
-                    break;
+                    MoveFileToFolder(dupFile, dup);
+                    cDup++;
                 }
             }
             Log($"Total: {cDup + cNew}, New: {cNew}, Dup: {cDup}");
         }
+
 
 
         #endregion
