@@ -33,7 +33,7 @@ namespace MusicManager
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.label1 = new System.Windows.Forms.Label();
             this.tboxSrcFolder = new System.Windows.Forms.TextBox();
-            this.rtboxLog = new System.Windows.Forms.RichTextBox();
+            this.rtboxLog = new Comps.MyRichTextBox();
             this.btnBrowseSrcFolder = new System.Windows.Forms.Button();
             this.btnDedup = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -57,7 +57,7 @@ namespace MusicManager
             // 
             // tboxSrcFolder
             // 
-            this.tboxSrcFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tboxSrcFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tboxSrcFolder.Location = new System.Drawing.Point(75, 12);
             this.tboxSrcFolder.Name = "tboxSrcFolder";
@@ -67,8 +67,8 @@ namespace MusicManager
             // 
             // rtboxLog
             // 
-            this.rtboxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.rtboxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.rtboxLog.Location = new System.Drawing.Point(12, 95);
             this.rtboxLog.Name = "rtboxLog";
@@ -114,7 +114,7 @@ namespace MusicManager
             // 
             // tboxDupFolder
             // 
-            this.tboxDupFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.tboxDupFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tboxDupFolder.Location = new System.Drawing.Point(75, 39);
             this.tboxDupFolder.Name = "tboxDupFolder";
@@ -198,7 +198,7 @@ namespace MusicManager
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tboxSrcFolder;
-        private System.Windows.Forms.RichTextBox rtboxLog;
+        private Comps.MyRichTextBox rtboxLog;
         private System.Windows.Forms.Button btnBrowseSrcFolder;
         private System.Windows.Forms.Button btnDedup;
         private System.Windows.Forms.Label label2;

@@ -26,7 +26,7 @@ namespace MusicManager
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.1";
+            this.Text = "Music manager v0.1.2";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
