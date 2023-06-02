@@ -26,7 +26,7 @@ namespace MusicManager
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.2";
+            this.Text = "Music manager v0.1.3";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -184,13 +184,56 @@ namespace MusicManager
                 .ToList();
         }
 
+        List<string> logs = new List<string>();
+
         void Log(string content)
         {
-            rtboxLog.Invoke((MethodInvoker)delegate
+            lock (logs)
             {
-                rtboxLog.Text = rtboxLog.Text + content + "\n";
-                rtboxLog.SelectionStart = rtboxLog.Text.Length;
-                rtboxLog.ScrollToCaret();
+                logs.Add(content);
+                if (logs.Count > 1024)
+                {
+                    while (logs.Count > 300)
+                    {
+                        logs.RemoveAt(0);
+                    }
+                }
+            }
+            RefreshLog();
+        }
+
+        bool isRequireUpdate = false;
+        bool isUpdating = false;
+        void RefreshLog()
+        {
+            if (isUpdating)
+            {
+                isRequireUpdate = true;
+                return;
+            }
+            isUpdating = true;
+
+            Task.Run(() =>
+            {
+                string content = null;
+                lock (logs)
+                {
+                    content = string.Join(Environment.NewLine, logs) ?? string.Empty;
+                }
+                rtboxLog.Invoke((MethodInvoker)delegate
+                {
+                    rtboxLog.Text = content;
+                    rtboxLog.SelectionStart = rtboxLog.Text.Length;
+                    rtboxLog.ScrollToCaret();
+                });
+                Task.Delay(1200).Wait();
+                isUpdating = false;
+
+                if (isRequireUpdate)
+                {
+                    isRequireUpdate = false;
+                    RefreshLog();
+                }
             });
         }
 
@@ -250,13 +293,43 @@ namespace MusicManager
             return filename;
         }
 
+        string TrimString(string str, int len)
+        {
+            if (str.Length > len - 3)
+            {
+                return str.Substring(0, len - 3) + "...";
+            }
+            return str;
+        }
+
+        string MergePerformers(string[] performers)
+        {
+            var ps = performers.SelectMany(p => p.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToList();
+            string r = "";
+            foreach (var p in ps)
+            {
+                if (r.Length + p.Length > 45)
+                {
+                    break;
+                }
+                r = r + p + ",";
+            }
+            if (r.Length > 1)
+            {
+                r = r.Substring(0, r.Length - 1);
+            }
+            return r;
+        }
+
         bool RenameFile(string src)
         {
             var mf = TagLib.File.Create(src);
             var folder = Path.GetDirectoryName(src);
             var ext = Path.GetExtension(src);
-            var artists = string.Join(",", mf.Tag.Performers);
+            var artists = MergePerformers(mf.Tag.Performers);
+
             var title = mf.Tag.Title;
+            title = TrimString(title, 70);
 
             if (string.IsNullOrWhiteSpace(ext) || string.IsNullOrWhiteSpace(artists) || string.IsNullOrWhiteSpace(title))
             {
