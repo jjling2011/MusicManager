@@ -54,10 +54,10 @@ namespace MusicManager.Views
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(10, 15);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(41, 12);
+            this.label1.Size = new System.Drawing.Size(47, 12);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Source";
-            this.toolTip1.SetToolTip(this.label1, "Music files folder.");
+            this.label1.Text = "Sources";
+            this.toolTip1.SetToolTip(this.label1, "Music file folders. Seperated by \'|\'.");
             // 
             // tboxSrcFolder
             // 
@@ -114,7 +114,7 @@ namespace MusicManager.Views
             this.label2.Size = new System.Drawing.Size(59, 12);
             this.label2.TabIndex = 0;
             this.label2.Text = "Duplicate";
-            this.toolTip1.SetToolTip(this.label2, "Duplicate music files folder.");
+            this.toolTip1.SetToolTip(this.label2, "Move duplicated music files to this folder.");
             // 
             // tboxDupFolder
             // 
@@ -189,12 +189,12 @@ namespace MusicManager.Views
             this.ctxMenuStripMore.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tagsEditorToolStripMenuItem});
             this.ctxMenuStripMore.Name = "ctxMenuStripMore";
-            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 48);
+            this.ctxMenuStripMore.Size = new System.Drawing.Size(141, 26);
             // 
             // tagsEditorToolStripMenuItem
             // 
             this.tagsEditorToolStripMenuItem.Name = "tagsEditorToolStripMenuItem";
-            this.tagsEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.tagsEditorToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.tagsEditorToolStripMenuItem.Text = "tags editor";
             this.tagsEditorToolStripMenuItem.Click += new System.EventHandler(this.tagsEditorToolStripMenuItem_Click);
             // 

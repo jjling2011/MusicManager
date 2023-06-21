@@ -34,22 +34,22 @@ namespace MusicManager.Views
             this.tboxFolder = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.checkAlbum = new System.Windows.Forms.CheckBox();
+            this.checkArtist = new System.Windows.Forms.CheckBox();
+            this.checkTitle = new System.Windows.Forms.CheckBox();
+            this.tboxAlbum = new System.Windows.Forms.TextBox();
+            this.tboxTitle = new System.Windows.Forms.TextBox();
+            this.tboxArtist = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.cboxSource = new System.Windows.Forms.ComboBox();
             this.tboxRegex = new System.Windows.Forms.TextBox();
             this.btnTest = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
-            this.checkTitle = new System.Windows.Forms.CheckBox();
-            this.tboxArtist = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.tboxTitle = new System.Windows.Forms.TextBox();
-            this.checkArtist = new System.Windows.Forms.CheckBox();
-            this.tboxAlbum = new System.Windows.Forms.TextBox();
-            this.checkAlbum = new System.Windows.Forms.CheckBox();
+            this.rtboxLog = new MusicManager.Comps.MyRichTextBox();
             this.btnClose = new System.Windows.Forms.Button();
             this.btnModify = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
-            this.rtboxLog = new MusicManager.Comps.MyRichTextBox();
             this.btnStop = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -102,6 +102,60 @@ namespace MusicManager.Views
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Modify";
             // 
+            // checkAlbum
+            // 
+            this.checkAlbum.AutoSize = true;
+            this.checkAlbum.Location = new System.Drawing.Point(6, 74);
+            this.checkAlbum.Name = "checkAlbum";
+            this.checkAlbum.Size = new System.Drawing.Size(54, 16);
+            this.checkAlbum.TabIndex = 0;
+            this.checkAlbum.Text = "Album";
+            this.checkAlbum.UseVisualStyleBackColor = true;
+            // 
+            // checkArtist
+            // 
+            this.checkArtist.AutoSize = true;
+            this.checkArtist.Location = new System.Drawing.Point(6, 20);
+            this.checkArtist.Name = "checkArtist";
+            this.checkArtist.Size = new System.Drawing.Size(60, 16);
+            this.checkArtist.TabIndex = 0;
+            this.checkArtist.Text = "Artist";
+            this.checkArtist.UseVisualStyleBackColor = true;
+            // 
+            // checkTitle
+            // 
+            this.checkTitle.AutoSize = true;
+            this.checkTitle.Location = new System.Drawing.Point(6, 47);
+            this.checkTitle.Name = "checkTitle";
+            this.checkTitle.Size = new System.Drawing.Size(54, 16);
+            this.checkTitle.TabIndex = 0;
+            this.checkTitle.Text = "Title";
+            this.checkTitle.UseVisualStyleBackColor = true;
+            // 
+            // tboxAlbum
+            // 
+            this.tboxAlbum.Location = new System.Drawing.Point(72, 72);
+            this.tboxAlbum.Name = "tboxAlbum";
+            this.tboxAlbum.Size = new System.Drawing.Size(182, 21);
+            this.tboxAlbum.TabIndex = 1;
+            this.tboxAlbum.TextChanged += new System.EventHandler(this.tboxAlbum_TextChanged);
+            // 
+            // tboxTitle
+            // 
+            this.tboxTitle.Location = new System.Drawing.Point(72, 45);
+            this.tboxTitle.Name = "tboxTitle";
+            this.tboxTitle.Size = new System.Drawing.Size(182, 21);
+            this.tboxTitle.TabIndex = 1;
+            this.tboxTitle.TextChanged += new System.EventHandler(this.tboxTitle_TextChanged);
+            // 
+            // tboxArtist
+            // 
+            this.tboxArtist.Location = new System.Drawing.Point(72, 18);
+            this.tboxArtist.Name = "tboxArtist";
+            this.tboxArtist.Size = new System.Drawing.Size(182, 21);
+            this.tboxArtist.TabIndex = 1;
+            this.tboxArtist.TextChanged += new System.EventHandler(this.tboxArtist_TextChanged);
+            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -118,7 +172,8 @@ namespace MusicManager.Views
             this.cboxSource.Items.AddRange(new object[] {
             "Artist",
             "Title",
-            "Album"});
+            "Album",
+            "Filename"});
             this.cboxSource.Location = new System.Drawing.Point(68, 39);
             this.cboxSource.Name = "cboxSource";
             this.cboxSource.Size = new System.Drawing.Size(204, 20);
@@ -155,24 +210,6 @@ namespace MusicManager.Views
             this.label3.TabIndex = 0;
             this.label3.Text = "Source";
             // 
-            // checkTitle
-            // 
-            this.checkTitle.AutoSize = true;
-            this.checkTitle.Location = new System.Drawing.Point(6, 47);
-            this.checkTitle.Name = "checkTitle";
-            this.checkTitle.Size = new System.Drawing.Size(54, 16);
-            this.checkTitle.TabIndex = 0;
-            this.checkTitle.Text = "Title";
-            this.checkTitle.UseVisualStyleBackColor = true;
-            // 
-            // tboxArtist
-            // 
-            this.tboxArtist.Location = new System.Drawing.Point(72, 18);
-            this.tboxArtist.Name = "tboxArtist";
-            this.tboxArtist.Size = new System.Drawing.Size(182, 21);
-            this.tboxArtist.TabIndex = 1;
-            this.tboxArtist.TextChanged += new System.EventHandler(this.tboxArtist_TextChanged);
-            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -186,41 +223,17 @@ namespace MusicManager.Views
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Log";
             // 
-            // tboxTitle
+            // rtboxLog
             // 
-            this.tboxTitle.Location = new System.Drawing.Point(72, 45);
-            this.tboxTitle.Name = "tboxTitle";
-            this.tboxTitle.Size = new System.Drawing.Size(182, 21);
-            this.tboxTitle.TabIndex = 1;
-            this.tboxTitle.TextChanged += new System.EventHandler(this.tboxTitle_TextChanged);
-            // 
-            // checkArtist
-            // 
-            this.checkArtist.AutoSize = true;
-            this.checkArtist.Location = new System.Drawing.Point(6, 20);
-            this.checkArtist.Name = "checkArtist";
-            this.checkArtist.Size = new System.Drawing.Size(60, 16);
-            this.checkArtist.TabIndex = 0;
-            this.checkArtist.Text = "Artist";
-            this.checkArtist.UseVisualStyleBackColor = true;
-            // 
-            // tboxAlbum
-            // 
-            this.tboxAlbum.Location = new System.Drawing.Point(72, 72);
-            this.tboxAlbum.Name = "tboxAlbum";
-            this.tboxAlbum.Size = new System.Drawing.Size(182, 21);
-            this.tboxAlbum.TabIndex = 1;
-            this.tboxAlbum.TextChanged += new System.EventHandler(this.tboxAlbum_TextChanged);
-            // 
-            // checkAlbum
-            // 
-            this.checkAlbum.AutoSize = true;
-            this.checkAlbum.Location = new System.Drawing.Point(6, 74);
-            this.checkAlbum.Name = "checkAlbum";
-            this.checkAlbum.Size = new System.Drawing.Size(54, 16);
-            this.checkAlbum.TabIndex = 0;
-            this.checkAlbum.Text = "Album";
-            this.checkAlbum.UseVisualStyleBackColor = true;
+            this.rtboxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.rtboxLog.Location = new System.Drawing.Point(6, 20);
+            this.rtboxLog.Name = "rtboxLog";
+            this.rtboxLog.ReadOnly = true;
+            this.rtboxLog.Size = new System.Drawing.Size(431, 295);
+            this.rtboxLog.TabIndex = 0;
+            this.rtboxLog.Text = "";
             // 
             // btnClose
             // 
@@ -254,18 +267,6 @@ namespace MusicManager.Views
             this.btnClear.Text = "Clear";
             this.btnClear.UseVisualStyleBackColor = true;
             this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
-            // 
-            // rtboxLog
-            // 
-            this.rtboxLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.rtboxLog.Location = new System.Drawing.Point(6, 20);
-            this.rtboxLog.Name = "rtboxLog";
-            this.rtboxLog.ReadOnly = true;
-            this.rtboxLog.Size = new System.Drawing.Size(431, 295);
-            this.rtboxLog.TabIndex = 0;
-            this.rtboxLog.Text = "";
             // 
             // btnStop
             // 

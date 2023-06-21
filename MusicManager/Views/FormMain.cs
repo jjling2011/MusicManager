@@ -21,7 +21,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.4";
+            this.Text = "Music manager v0.1.5";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -373,6 +373,12 @@ namespace MusicManager.Views
             var folders = SrcToFolders(src);
             foreach (var folder in folders)
             {
+                if (!Directory.Exists(folder))
+                {
+                    Log($"Dir not exists: {folder}");
+                    continue;
+                }
+
                 Log($"Rename folder: {folder}");
                 foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
                 {
@@ -420,6 +426,12 @@ namespace MusicManager.Views
             var folders = SrcToFolders(src);
             foreach (var folder in folders)
             {
+                if (!Directory.Exists(folder))
+                {
+                    Log($"Dir not exists: {folder}");
+                    continue;
+                }
+
                 Log($"Dedup folder: {folder}");
                 foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
                 {

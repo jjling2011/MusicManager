@@ -87,73 +87,14 @@ namespace MusicManager.Views
         CancellationTokenSource cts = null;
         private void btnModify_Click(object sender, EventArgs e)
         {
-            var src = tboxFolder.Text;
-            if (!Directory.Exists(src))
-            {
-                Log($"Error: source folder do not exists!");
-                return;
-            }
-
-            var dest = Path.Combine(src, "output");
-            if (!Directory.Exists(dest))
-            {
-                Directory.CreateDirectory(dest);
-            }
-
-            var r = tboxRegex.Text;
-            var artist = checkArtist.Checked ? tboxArtist.Text : null;
-            var title = checkTitle.Checked ? tboxTitle.Text : null;
-            var album = checkAlbum.Checked ? tboxAlbum.Text : null;
-            var idx = cboxSource.SelectedIndex;
-
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-
-            Task.Run(() =>
-            {
-                ModifyMusicFiles(src, dest, idx, r, artist, title, album, cts.Token);
-                Log("Done!");
-            });
+            ProcessFolder(false);
         }
+
+
 
         private void btnTest_Click(object sender, EventArgs e)
         {
-            var folder = tboxFolder.Text;
-            var file = Utils.Tools.GetFirstMusicFile(folder);
-            if (string.IsNullOrEmpty(file))
-            {
-                Log($"Error: find no musice file!");
-                return;
-            }
-
-            Log($"File: {file}");
-            string tag = GetTagFromFile(cboxSource.SelectedIndex, file);
-            try
-            {
-                Log($"Tag: {tag}");
-                var p = tboxRegex.Text;
-                if (checkArtist.Checked)
-                {
-                    var o = Regex.Replace(tag, p, tboxArtist.Text);
-                    Log($"Artis: {o}");
-                }
-                if (checkTitle.Checked)
-                {
-                    var o = Regex.Replace(tag, p, tboxTitle.Text);
-                    Log($"Title: {o}");
-                }
-                if (checkAlbum.Checked)
-                {
-                    var o = Regex.Replace(tag, p, tboxAlbum.Text);
-                    Log($"Album: {o}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log(ex.ToString());
-            }
-            Log("Done!");
+            ProcessFolder(true);
         }
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -173,7 +114,32 @@ namespace MusicManager.Views
         #endregion
 
         #region private
-        void ModifyMusicFiles(string src, string dest, int index, string regex, string artist, string title, string album,
+        private void ProcessFolder(bool isDryRun)
+        {
+            var src = tboxFolder.Text;
+            if (!Directory.Exists(src))
+            {
+                Log($"Error: source folder do not exists!");
+                return;
+            }
+
+            var r = tboxRegex.Text;
+            var artist = checkArtist.Checked ? tboxArtist.Text : null;
+            var title = checkTitle.Checked ? tboxTitle.Text : null;
+            var album = checkAlbum.Checked ? tboxAlbum.Text : null;
+            var idx = cboxSource.SelectedIndex;
+
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(() =>
+            {
+                ModifyMusicFiles(isDryRun, src, idx, r, artist, title, album, cts.Token);
+                Log("Done!");
+            });
+        }
+
+        void ModifyMusicFiles(bool isDryRun, string src, int index, string regex, string artist, string title, string album,
             CancellationToken token)
         {
             foreach (string file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories))
@@ -188,7 +154,7 @@ namespace MusicManager.Views
                 }
                 try
                 {
-                    ModifyTags(index, file, regex, artist, title, album);
+                    ModifyTags(isDryRun, index, file, regex, artist, title, album);
                 }
                 catch (Exception ex)
                 {
@@ -197,13 +163,13 @@ namespace MusicManager.Views
             }
         }
 
-        void ModifyTags(int index, string file, string regex, string artist, string title, string album)
+        void ModifyTags(bool isDryRun, int index, string file, string regex, string artist, string title, string album)
         {
             Log($"File: {file}");
             var tag = GetTagFromFile(index, file);
             var music = TagLib.File.Create(file);
 
-            Log($"Tag: {tag}");
+            Log($"Text: {tag}");
             if (artist != null)
             {
                 var o = Regex.Replace(tag, regex, artist);
@@ -225,6 +191,11 @@ namespace MusicManager.Views
                 music.Tag.Album = o;
             }
 
+            if (isDryRun)
+            {
+                return;
+            }
+
             if (artist != null || title != null || album != null)
             {
                 music.Save();
@@ -240,6 +211,8 @@ namespace MusicManager.Views
                     return tags.Title;
                 case 2:
                     return tags.Album;
+                case 3:
+                    return Path.GetFileName(file);
                 default:
                     return string.Join(",", tags.Performers);
             }
@@ -252,9 +225,9 @@ namespace MusicManager.Views
             lock (logs)
             {
                 logs.Add(content);
-                if (logs.Count > 1024)
+                if (logs.Count > 2048)
                 {
-                    while (logs.Count > 300)
+                    while (logs.Count > 1024)
                     {
                         logs.RemoveAt(0);
                     }
