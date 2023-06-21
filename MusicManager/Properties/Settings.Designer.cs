@@ -46,5 +46,77 @@ namespace MusicManager.Properties {
                 this["dupFolder"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\")]
+        public string tagsEditorSrcFolder {
+            get {
+                return ((string)(this["tagsEditorSrcFolder"]));
+            }
+            set {
+                this["tagsEditorSrcFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string tagsEditorSrcRegex {
+            get {
+                return ((string)(this["tagsEditorSrcRegex"]));
+            }
+            set {
+                this["tagsEditorSrcRegex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string tagsEditorArtistRegex {
+            get {
+                return ((string)(this["tagsEditorArtistRegex"]));
+            }
+            set {
+                this["tagsEditorArtistRegex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string tagsEditorTitleRegex {
+            get {
+                return ((string)(this["tagsEditorTitleRegex"]));
+            }
+            set {
+                this["tagsEditorTitleRegex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string tagsEditorAlbumRegex {
+            get {
+                return ((string)(this["tagsEditorAlbumRegex"]));
+            }
+            set {
+                this["tagsEditorAlbumRegex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int tagsEditorIndex {
+            get {
+                return ((int)(this["tagsEditorIndex"]));
+            }
+            set {
+                this["tagsEditorIndex"] = value;
+            }
+        }
     }
 }

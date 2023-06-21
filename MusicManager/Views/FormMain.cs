@@ -10,33 +10,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace MusicManager
+namespace MusicManager.Views
 {
     public partial class FormMain : Form
     {
-        readonly string supportedMusicFormats = @"aa, aax, aac, aiff, ape, dsf, flac, m4a, m4b, m4p, mp3, mpc, mpp, ogg, oga, wav, wma, wv, webm";
-
         const char pathSpliter = '|';
-
         CancellationTokenSource cts;
-
-        Dictionary<string, bool> musicExtensions = new Dictionary<string, bool>();
 
         public FormMain()
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.3";
+            this.Text = "Music manager v0.1.4";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
-
-            var formats = supportedMusicFormats.Replace(" ", "").Split(',');
-            foreach (var format in formats)
-            {
-                musicExtensions.Add($".{format.ToLower()}", true);
-            }
-
         }
 
         #region UI handler
@@ -54,6 +42,15 @@ namespace MusicManager
                 }
             }
         }
+
+        private void btnMore_Click(object sender, EventArgs e)
+        {
+            Button btnSender = (Button)sender;
+            Point ptLowerLeft = new Point(0, btnSender.Height);
+            ptLowerLeft = btnSender.PointToScreen(ptLowerLeft);
+            ctxMenuStripMore.Show(ptLowerLeft);
+        }
+
         private void btnClearLog_Click(object sender, EventArgs e)
         {
             rtboxLog.Text = string.Empty;
@@ -77,7 +74,7 @@ namespace MusicManager
             var src = Properties.Settings.Default.srcFolder;
             var folders = SrcToFolders(src);
 
-            var folder = ShowBrowseFolderDialog(folders.LastOrDefault());
+            var folder = Utils.UI.ShowBrowseFolderDialog(folders.LastOrDefault());
             if (string.IsNullOrEmpty(folder))
             {
                 return;
@@ -96,7 +93,7 @@ namespace MusicManager
         private void btnBrowseDupFolder_Click(object sender, EventArgs e)
         {
             var path = Properties.Settings.Default.dupFolder;
-            var dup = ShowBrowseFolderDialog(path);
+            var dup = Utils.UI.ShowBrowseFolderDialog(path);
             if (!string.IsNullOrEmpty(dup))
             {
                 tboxDupFolder.Text = dup;
@@ -143,6 +140,25 @@ namespace MusicManager
             Log("Send stop signal");
             cts?.Cancel();
         }
+
+        FormTagsEditor tagsEditor = null;
+        readonly object tagsEditorLock = new object();
+        private void tagsEditorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            lock (tagsEditorLock)
+            {
+                if (tagsEditor == null)
+                {
+                    tagsEditor = new FormTagsEditor();
+                    tagsEditor.FormClosed += (s, evt) =>
+                    {
+                        tagsEditor = null;
+                    };
+                }
+            }
+            tagsEditor.Show();
+            tagsEditor.Activate();
+        }
         #endregion
 
         #region UI helper
@@ -155,18 +171,7 @@ namespace MusicManager
             });
         }
 
-        private static string ShowBrowseFolderDialog(string initPath)
-        {
-            string folderPath = "";
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
-            dialog.SelectedPath = initPath;
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                folderPath = dialog.SelectedPath;
-            }
 
-            return folderPath;
-        }
         #endregion
 
         #region private
@@ -359,12 +364,6 @@ namespace MusicManager
             return true;
         }
 
-        bool IsMusicFile(string file)
-        {
-            var ext = Path.GetExtension(file).ToLower();
-            return musicExtensions.ContainsKey(ext);
-        }
-
         void RenameFolders(string src, CancellationToken token)
         {
             var cMv = 0;
@@ -383,7 +382,7 @@ namespace MusicManager
                         Log($"Total: {cTotal}, Move: {cMv}, Skip: {cSkip}");
                         return;
                     }
-                    if (IsMusicFile(file))
+                    if (Utils.Tools.IsMusicFile(file))
                     {
                         cTotal++;
                         if (RenameFile(file))
@@ -430,7 +429,7 @@ namespace MusicManager
                         Log($"Total: {cDup + cNew}, New: {cNew}, Dup: {cDup}");
                         return;
                     }
-                    if (!IsMusicFile(file))
+                    if (!Utils.Tools.IsMusicFile(file))
                     {
                         continue;
                     }
@@ -446,6 +445,8 @@ namespace MusicManager
             }
             Log($"Total: {cDup + cNew}, New: {cNew}, Dup: {cDup}");
         }
+
+
 
 
 

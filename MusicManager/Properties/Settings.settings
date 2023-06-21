@@ -8,5 +8,23 @@
     <Setting Name="dupFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\dup</Value>
     </Setting>
+    <Setting Name="tagsEditorSrcFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\</Value>
+    </Setting>
+    <Setting Name="tagsEditorSrcRegex" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tagsEditorArtistRegex" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tagsEditorTitleRegex" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tagsEditorAlbumRegex" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="tagsEditorIndex" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
