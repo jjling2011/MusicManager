@@ -380,6 +380,7 @@ namespace MusicManager.Views
                 }
 
                 Log($"Rename folder: {folder}");
+                var musics = new List<string>();
                 foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
                 {
                     if (token.IsCancellationRequested)
@@ -390,15 +391,27 @@ namespace MusicManager.Views
                     }
                     if (Utils.Tools.IsMusicFile(file))
                     {
-                        cTotal++;
-                        if (RenameFile(file))
-                        {
-                            cMv++;
-                        }
-                        else
-                        {
-                            cSkip++;
-                        }
+                        musics.Add(file);
+                    }
+                }
+
+                foreach (string file in musics)
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        Log("Stop by user");
+                        Log($"Total: {cTotal}, Move: {cMv}, Skip: {cSkip}");
+                        return;
+                    }
+
+                    cTotal++;
+                    if (RenameFile(file))
+                    {
+                        cMv++;
+                    }
+                    else
+                    {
+                        cSkip++;
                     }
                 }
             }
