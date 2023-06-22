@@ -15,9 +15,12 @@ namespace MusicManager.Views
 {
     public partial class FormTagsEditor : Form
     {
+        readonly Comps.Logger logger = null;
+
         public FormTagsEditor()
         {
             InitializeComponent();
+            logger = new Comps.Logger(rtboxLog);
         }
 
         private void FormTagsEditor_Load(object sender, EventArgs e)
@@ -99,11 +102,7 @@ namespace MusicManager.Views
 
         private void btnClear_Click(object sender, EventArgs e)
         {
-            lock (logs)
-            {
-                logs.Clear();
-            }
-            RefreshLog();
+            logger.Clear();
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -119,7 +118,7 @@ namespace MusicManager.Views
             var src = tboxFolder.Text;
             if (!Directory.Exists(src))
             {
-                Log($"Error: source folder do not exists!");
+                logger.Log($"Error: source folder do not exists!");
                 return;
             }
 
@@ -135,7 +134,7 @@ namespace MusicManager.Views
             Task.Run(() =>
             {
                 ModifyMusicFiles(isDryRun, src, idx, r, artist, title, album, cts.Token);
-                Log("Done!");
+                logger.Log("Done!");
             });
         }
 
@@ -158,36 +157,36 @@ namespace MusicManager.Views
                 }
                 catch (Exception ex)
                 {
-                    Log(ex.ToString());
+                    logger.Log(ex.ToString());
                 }
             }
         }
 
         void ModifyTags(bool isDryRun, int index, string file, string regex, string artist, string title, string album)
         {
-            Log($"File: {file}");
+            logger.Log($"File: {file}");
             var tag = GetTagFromFile(index, file);
             var music = TagLib.File.Create(file);
 
-            Log($"Text: {tag}");
+            logger.Log($"Text: {tag}");
             if (artist != null)
             {
                 var o = Regex.Replace(tag, regex, artist);
-                Log($"Artis: {o}");
+                logger.Log($"Artis: {o}");
                 music.Tag.Performers = new string[1] { o };
             }
 
             if (title != null)
             {
                 var o = Regex.Replace(tag, regex, title);
-                Log($"Title: {o}");
+                logger.Log($"Title: {o}");
                 music.Tag.Title = o;
             }
 
             if (album != null)
             {
                 var o = Regex.Replace(tag, regex, album);
-                Log($"Album: {o}");
+                logger.Log($"Album: {o}");
                 music.Tag.Album = o;
             }
 
@@ -217,44 +216,6 @@ namespace MusicManager.Views
                     return string.Join(",", tags.Performers);
             }
         }
-
-        List<string> logs = new List<string>();
-
-        void Log(string content)
-        {
-            lock (logs)
-            {
-                logs.Add(content);
-                if (logs.Count > 2048)
-                {
-                    while (logs.Count > 1024)
-                    {
-                        logs.RemoveAt(0);
-                    }
-                }
-            }
-            RefreshLog();
-        }
-
-        void RefreshLog()
-        {
-            string content = null;
-            lock (logs)
-            {
-                content = string.Join(Environment.NewLine, logs) ?? string.Empty;
-            }
-            rtboxLog.Invoke((MethodInvoker)delegate
-            {
-                rtboxLog.Text = content;
-                rtboxLog.SelectionStart = rtboxLog.Text.Length;
-                rtboxLog.ScrollToCaret();
-            });
-        }
-
-
-
         #endregion
-
-
     }
 }

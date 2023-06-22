@@ -29,6 +29,7 @@ namespace MusicManager.Views
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormTagsEditor));
             this.label1 = new System.Windows.Forms.Label();
             this.tboxFolder = new System.Windows.Forms.TextBox();
@@ -51,6 +52,8 @@ namespace MusicManager.Views
             this.btnModify = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -63,6 +66,7 @@ namespace MusicManager.Views
             this.label1.Size = new System.Drawing.Size(41, 12);
             this.label1.TabIndex = 0;
             this.label1.Text = "Folder";
+            this.toolTip1.SetToolTip(this.label1, "Musics folder.");
             // 
             // tboxFolder
             // 
@@ -89,6 +93,7 @@ namespace MusicManager.Views
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.richTextBox1);
             this.groupBox1.Controls.Add(this.checkAlbum);
             this.groupBox1.Controls.Add(this.checkArtist);
             this.groupBox1.Controls.Add(this.checkTitle);
@@ -110,6 +115,7 @@ namespace MusicManager.Views
             this.checkAlbum.Size = new System.Drawing.Size(54, 16);
             this.checkAlbum.TabIndex = 0;
             this.checkAlbum.Text = "Album";
+            this.toolTip1.SetToolTip(this.checkAlbum, "Modify album tag?");
             this.checkAlbum.UseVisualStyleBackColor = true;
             // 
             // checkArtist
@@ -120,6 +126,7 @@ namespace MusicManager.Views
             this.checkArtist.Size = new System.Drawing.Size(60, 16);
             this.checkArtist.TabIndex = 0;
             this.checkArtist.Text = "Artist";
+            this.toolTip1.SetToolTip(this.checkArtist, "Modify artist tag?");
             this.checkArtist.UseVisualStyleBackColor = true;
             // 
             // checkTitle
@@ -130,6 +137,7 @@ namespace MusicManager.Views
             this.checkTitle.Size = new System.Drawing.Size(54, 16);
             this.checkTitle.TabIndex = 0;
             this.checkTitle.Text = "Title";
+            this.toolTip1.SetToolTip(this.checkTitle, "Modify title tag?");
             this.checkTitle.UseVisualStyleBackColor = true;
             // 
             // tboxAlbum
@@ -164,6 +172,7 @@ namespace MusicManager.Views
             this.label2.Size = new System.Drawing.Size(35, 12);
             this.label2.TabIndex = 0;
             this.label2.Text = "Regex";
+            this.toolTip1.SetToolTip(this.label2, "CSharp regex for source tag.");
             // 
             // cboxSource
             // 
@@ -198,6 +207,7 @@ namespace MusicManager.Views
             this.btnTest.Size = new System.Drawing.Size(75, 23);
             this.btnTest.TabIndex = 2;
             this.btnTest.Text = "Test";
+            this.toolTip1.SetToolTip(this.btnTest, "Dry run.");
             this.btnTest.UseVisualStyleBackColor = true;
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
@@ -209,6 +219,7 @@ namespace MusicManager.Views
             this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 0;
             this.label3.Text = "Source";
+            this.toolTip1.SetToolTip(this.label3, "Source tag.");
             // 
             // groupBox2
             // 
@@ -243,6 +254,7 @@ namespace MusicManager.Views
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 2;
             this.btnClose.Text = "Close";
+            this.toolTip1.SetToolTip(this.btnClose, "Close this window.");
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
@@ -254,6 +266,7 @@ namespace MusicManager.Views
             this.btnModify.Size = new System.Drawing.Size(75, 23);
             this.btnModify.TabIndex = 2;
             this.btnModify.Text = "Modify";
+            this.toolTip1.SetToolTip(this.btnModify, "Modify tags of musics.");
             this.btnModify.UseVisualStyleBackColor = true;
             this.btnModify.Click += new System.EventHandler(this.btnModify_Click);
             // 
@@ -265,6 +278,7 @@ namespace MusicManager.Views
             this.btnClear.Size = new System.Drawing.Size(75, 23);
             this.btnClear.TabIndex = 2;
             this.btnClear.Text = "Clear";
+            this.toolTip1.SetToolTip(this.btnClear, "Clear log.");
             this.btnClear.UseVisualStyleBackColor = true;
             this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
@@ -278,6 +292,17 @@ namespace MusicManager.Views
             this.btnStop.Text = "Stop";
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox1.Location = new System.Drawing.Point(6, 99);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(248, 216);
+            this.richTextBox1.TabIndex = 2;
+            this.richTextBox1.Text = " ** Tags which are selected above, will be replaced by the following algorithm:\n\n" +
+    "(C#) Regex.Replace({source}, {source regex}, {tag regex})";
             // 
             // FormTagsEditor
             // 
@@ -334,5 +359,7 @@ namespace MusicManager.Views
         private System.Windows.Forms.Button btnModify;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.Button btnStop;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
