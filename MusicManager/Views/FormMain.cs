@@ -22,7 +22,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.6";
+            this.Text = "Music manager v0.1.7";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -34,7 +34,9 @@ namespace MusicManager.Views
         {
             var cache = new Dictionary<string, bool>();
 
-            foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+            foreach (
+                string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories)
+            )
             {
                 var ext = Path.GetExtension(file);
                 if (!cache.ContainsKey(ext))
@@ -59,6 +61,7 @@ namespace MusicManager.Views
             // var folder = tboxSrcFolder.Text;
             // dbg_getter_exts(folder);
         }
+
         private void tboxSrcFolder_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.srcFolder = tboxSrcFolder.Text;
@@ -117,7 +120,6 @@ namespace MusicManager.Views
                 RenameFolders(src, cts.Token);
                 ToggleBtnState(true);
             });
-
         }
 
         private void btnDedup_Click(object sender, EventArgs e)
@@ -145,6 +147,7 @@ namespace MusicManager.Views
 
         FormTagsEditor tagsEditor = null;
         readonly object tagsEditorLock = new object();
+
         private void tagsEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
             lock (tagsEditorLock)
@@ -166,13 +169,15 @@ namespace MusicManager.Views
         #region UI helper
         void ToggleBtnState(bool isEnable)
         {
-            btnDedup.Invoke((MethodInvoker)delegate
-            {
-                btnDedup.Enabled = isEnable;
-                btnRename.Enabled = isEnable;
-            });
+            btnDedup.Invoke(
+                (MethodInvoker)
+                    delegate
+                    {
+                        btnDedup.Enabled = isEnable;
+                        btnRename.Enabled = isEnable;
+                    }
+            );
         }
-
 
         #endregion
 
@@ -211,6 +216,8 @@ namespace MusicManager.Views
                 return string.Empty;
             }
 
+            /*
+            // keep old music file by timestamp
             var dbFileTimestamp = new FileInfo(musics[key]).CreationTime;
             var curFileTimestamp = new FileInfo(file).CreationTime;
             if (dbFileTimestamp.CompareTo(curFileTimestamp) > 0)
@@ -220,7 +227,9 @@ namespace MusicManager.Views
                 logger.Log($"[dup] {r} of {file}");
                 return r;
             }
+            */
 
+            // keep old music file by search order
             logger.Log($"[dup] {file} of {musics[key]}");
             return file;
         }
@@ -237,7 +246,9 @@ namespace MusicManager.Views
             File.Move(srcFile, destFile);
         }
 
-        string invalidFilenameChars = new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+        string invalidFilenameChars =
+            new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
+
         string RemoveIllegalFilenameChars(string filename)
         {
             foreach (char c in invalidFilenameChars)
@@ -258,7 +269,9 @@ namespace MusicManager.Views
 
         string MergePerformers(string[] performers)
         {
-            var ps = performers.SelectMany(p => p.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToList();
+            var ps = performers
+                .SelectMany(p => p.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                .ToList();
             string r = "";
             foreach (var p in ps)
             {
@@ -285,7 +298,11 @@ namespace MusicManager.Views
             var title = mf.Tag.Title;
             title = TrimString(title, 70);
 
-            if (string.IsNullOrWhiteSpace(ext) || string.IsNullOrWhiteSpace(artists) || string.IsNullOrWhiteSpace(title))
+            if (
+                string.IsNullOrWhiteSpace(ext)
+                || string.IsNullOrWhiteSpace(artists)
+                || string.IsNullOrWhiteSpace(title)
+            )
             {
                 logger.Log($"[empt-tag] {src}");
                 return false;
@@ -330,7 +347,13 @@ namespace MusicManager.Views
 
                 logger.Log($"Rename folder: {folder}");
                 var musics = new List<string>();
-                foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+                foreach (
+                    string file in Directory.EnumerateFiles(
+                        folder,
+                        "*.*",
+                        SearchOption.AllDirectories
+                    )
+                )
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -395,7 +418,13 @@ namespace MusicManager.Views
                 }
 
                 logger.Log($"Dedup folder: {folder}");
-                foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+                foreach (
+                    string file in Directory.EnumerateFiles(
+                        folder,
+                        "*.*",
+                        SearchOption.AllDirectories
+                    )
+                )
                 {
                     if (token.IsCancellationRequested)
                     {
@@ -420,12 +449,6 @@ namespace MusicManager.Views
             logger.Log($"Total: {cDup + cNew}, New: {cNew}, Dup: {cDup}");
         }
 
-
-
-
-
         #endregion
-
-
     }
 }
