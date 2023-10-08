@@ -46,6 +46,7 @@ namespace MusicManager.Views
             this.btnMore = new System.Windows.Forms.Button();
             this.ctxMenuStripMore = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tagsEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.janitorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxMenuStripMore.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -187,16 +188,24 @@ namespace MusicManager.Views
             // ctxMenuStripMore
             // 
             this.ctxMenuStripMore.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tagsEditorToolStripMenuItem});
+            this.tagsEditorToolStripMenuItem,
+            this.janitorToolStripMenuItem});
             this.ctxMenuStripMore.Name = "ctxMenuStripMore";
-            this.ctxMenuStripMore.Size = new System.Drawing.Size(141, 26);
+            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 70);
             // 
             // tagsEditorToolStripMenuItem
             // 
             this.tagsEditorToolStripMenuItem.Name = "tagsEditorToolStripMenuItem";
-            this.tagsEditorToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
+            this.tagsEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.tagsEditorToolStripMenuItem.Text = "tags editor";
             this.tagsEditorToolStripMenuItem.Click += new System.EventHandler(this.tagsEditorToolStripMenuItem_Click);
+            // 
+            // janitorToolStripMenuItem
+            // 
+            this.janitorToolStripMenuItem.Name = "janitorToolStripMenuItem";
+            this.janitorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.janitorToolStripMenuItem.Text = "janitor";
+            this.janitorToolStripMenuItem.Click += new System.EventHandler(this.janitorToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -242,6 +251,7 @@ namespace MusicManager.Views
         private System.Windows.Forms.Button btnMore;
         private System.Windows.Forms.ContextMenuStrip ctxMenuStripMore;
         private System.Windows.Forms.ToolStripMenuItem tagsEditorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem janitorToolStripMenuItem;
     }
 }
 

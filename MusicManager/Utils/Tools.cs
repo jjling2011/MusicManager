@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace MusicManager.Utils
 {
-
     public static class Tools
     {
-        readonly static string supportedMusicFormats = @"aa, aax, aac, aiff, ape, dsf, flac, m4a, m4b, m4p, mp3, mpc, mpp, ogg, oga, wav, wma, wv, webm";
+        static readonly string supportedMusicFormats =
+            @"aa, aax, aac, aiff, ape, dsf, flac, m4a, m4b, m4p, mp3, mpc, mpp, ogg, oga, wav, wma, wv, webm";
         static Dictionary<string, bool> musicExtensions = new Dictionary<string, bool>();
 
         static Tools()
@@ -29,9 +29,10 @@ namespace MusicManager.Utils
                 return null;
             }
 
-            foreach (string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories))
+            foreach (
+                string file in Directory.EnumerateFiles(folder, "*.*", SearchOption.AllDirectories)
+            )
             {
-
                 if (IsMusicFile(file))
                 {
                     return file;

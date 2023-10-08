@@ -22,7 +22,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.7";
+            this.Text = "Music manager v0.1.8";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -145,12 +145,13 @@ namespace MusicManager.Views
             cts?.Cancel();
         }
 
+        FormJanitor janitor = null;
         FormTagsEditor tagsEditor = null;
-        readonly object tagsEditorLock = new object();
+        readonly object formLock = new object();
 
         private void tagsEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            lock (tagsEditorLock)
+            lock (formLock)
             {
                 if (tagsEditor == null)
                 {
@@ -163,6 +164,23 @@ namespace MusicManager.Views
             }
             tagsEditor.Show();
             tagsEditor.Activate();
+        }
+
+        private void janitorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            lock (formLock)
+            {
+                if (janitor == null)
+                {
+                    janitor = new FormJanitor();
+                    janitor.FormClosed += (s, evt) =>
+                    {
+                        janitor = null;
+                    };
+                }
+            }
+            janitor.Show();
+            janitor.Activate();
         }
         #endregion
 

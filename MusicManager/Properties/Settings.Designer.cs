@@ -118,5 +118,17 @@ namespace MusicManager.Properties {
                 this["tagsEditorIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\")]
+        public string jntrSrcFolder {
+            get {
+                return ((string)(this["jntrSrcFolder"]));
+            }
+            set {
+                this["jntrSrcFolder"] = value;
+            }
+        }
     }
 }
