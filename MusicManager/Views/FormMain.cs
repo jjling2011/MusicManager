@@ -14,7 +14,6 @@ namespace MusicManager.Views
 {
     public partial class FormMain : Form
     {
-        const char pathSpliter = '|';
         CancellationTokenSource cts;
         readonly Comps.Logger logger = null;
 
@@ -22,7 +21,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.8";
+            this.Text = "Music manager v0.1.9";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -77,7 +76,7 @@ namespace MusicManager.Views
         private void btnBrowseSrcFolder_Click(object sender, EventArgs e)
         {
             var src = Properties.Settings.Default.srcFolder;
-            var folders = SrcToFolders(src);
+            var folders = Utils.Tools.SplitFolders(src);
 
             var folder = Utils.UI.ShowBrowseFolderDialog(folders.LastOrDefault());
             if (string.IsNullOrEmpty(folder))
@@ -89,7 +88,7 @@ namespace MusicManager.Views
                 folders.Add(folder);
             }
 
-            src = FoldersToSrc(folders);
+            src = Utils.Tools.JoinFolders(folders);
             tboxSrcFolder.Text = src;
             Properties.Settings.Default.srcFolder = src;
             Properties.Settings.Default.Save();
@@ -200,19 +199,8 @@ namespace MusicManager.Views
         #endregion
 
         #region private
-        string FoldersToSrc(IEnumerable<string> folders)
-        {
-            var r = folders.Select(e => e.Trim()).Where(e => !string.IsNullOrWhiteSpace(e));
-            return string.Join($" {pathSpliter} ", r);
-        }
 
-        List<string> SrcToFolders(string src)
-        {
-            return src.Split(pathSpliter)
-                .Select(e => e.Trim())
-                .Where(e => !string.IsNullOrWhiteSpace(e))
-                .ToList();
-        }
+
 
         Dictionary<string, string> musics = new Dictionary<string, string>();
 
@@ -354,7 +342,7 @@ namespace MusicManager.Views
             var cSkip = 0;
             var cTotal = 0;
 
-            var folders = SrcToFolders(src);
+            var folders = Utils.Tools.SplitFolders(src);
             foreach (var folder in folders)
             {
                 if (!Directory.Exists(folder))
@@ -426,7 +414,7 @@ namespace MusicManager.Views
             var cDup = 0;
             musics.Clear();
 
-            var folders = SrcToFolders(src);
+            var folders = Utils.Tools.SplitFolders(src);
             foreach (var folder in folders)
             {
                 if (!Directory.Exists(folder))

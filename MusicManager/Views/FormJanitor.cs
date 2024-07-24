@@ -20,34 +20,68 @@ namespace MusicManager.Views
 
         private void FormJanitor_Load(object sender, EventArgs e)
         {
-            tboxFolder.Text = Properties.Settings.Default.jntrSrcFolder;
+            tboxLrcFolders.Text = Properties.Settings.Default.jntrLrcFolder;
+            tboxMusicFolders.Text = Properties.Settings.Default.jntrMusicFolder;
         }
 
         #region UI handler
-        private void btnBrowseFolder_Click(object sender, EventArgs e)
+        private void btnBrowseLrcFolders_Click(object sender, EventArgs e)
         {
-            var folder = Utils.UI.ShowBrowseFolderDialog(tboxFolder.Text);
-            if (!string.IsNullOrEmpty(folder))
+            var src = Properties.Settings.Default.jntrLrcFolder;
+            var folders = Utils.Tools.SplitFolders(src);
+
+            var folder = Utils.UI.ShowBrowseFolderDialog(folders.LastOrDefault());
+            if (string.IsNullOrEmpty(folder))
             {
-                tboxFolder.Text = folder;
-                Properties.Settings.Default.jntrSrcFolder = folder;
-                Properties.Settings.Default.Save();
+                return;
             }
+            if (!folders.Contains(folder))
+            {
+                folders.Add(folder);
+            }
+
+            src = Utils.Tools.JoinFolders(folders);
+            tboxLrcFolders.Text = src;
+            Properties.Settings.Default.jntrLrcFolder = src;
+            Properties.Settings.Default.Save();
+        }
+
+        private void btnBrowseMusicFolders_Click(object sender, EventArgs e)
+        {
+            var src = Properties.Settings.Default.jntrMusicFolder;
+            var folders = Utils.Tools.SplitFolders(src);
+
+            var folder = Utils.UI.ShowBrowseFolderDialog(folders.LastOrDefault());
+            if (string.IsNullOrEmpty(folder))
+            {
+                return;
+            }
+            if (!folders.Contains(folder))
+            {
+                folders.Add(folder);
+            }
+
+            src = Utils.Tools.JoinFolders(folders);
+            tboxMusicFolders.Text = src;
+            Properties.Settings.Default.jntrMusicFolder = src;
+            Properties.Settings.Default.Save();
         }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
             btnSearch.Enabled = false;
-            var folder = tboxFolder.Text;
+            var lrcFolders = tboxLrcFolders.Text;
+            var musicFolders = tboxMusicFolders.Text;
             Task.Run(() =>
             {
-                var files = Search(folder);
+                var files = SearchForInvalidLrcs(lrcFolders, musicFolders);
                 btnSearch.Invoke(
                     (MethodInvoker)
                         delegate
                         {
                             mrichFilePaths.Text = string.Join(Environment.NewLine, files);
                             btnSearch.Enabled = true;
+                            MessageBox.Show($"Total: {files.Count} files");
                         }
                 );
             });
@@ -90,8 +124,8 @@ namespace MusicManager.Views
                         delegate
                         {
                             MessageBox.Show("Done!");
+                            mrichFilePaths.Text = "";
                             btnRemove.Enabled = true;
-                            btnSearch.PerformClick();
                         }
                 );
             });
@@ -102,7 +136,7 @@ namespace MusicManager.Views
             Close();
         }
 
-        private void tboxFolder_KeyDown(object sender, KeyEventArgs e)
+        private void tboxMusicFolders_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode != Keys.Enter)
             {
@@ -110,42 +144,70 @@ namespace MusicManager.Views
             }
 
             e.SuppressKeyPress = true;
-            Properties.Settings.Default.jntrSrcFolder = tboxFolder.Text;
+            Properties.Settings.Default.jntrMusicFolder = tboxMusicFolders.Text;
+            Properties.Settings.Default.Save();
+        }
+
+        private void tboxLrcFolder_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter)
+            {
+                return;
+            }
+
+            e.SuppressKeyPress = true;
+            Properties.Settings.Default.jntrLrcFolder = tboxLrcFolders.Text;
             Properties.Settings.Default.Save();
         }
 
         #endregion
 
         #region private
-        List<string> Search(string folder)
+        HashSet<string> SearchMusics(string musicSrc)
         {
             var musics = new HashSet<string>();
+            var folders = Utils.Tools.SplitFolders(musicSrc);
+            foreach (var folder in folders)
+            {
+                if (!Directory.Exists(folder))
+                {
+                    continue;
+                }
+                var files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    if (Utils.Tools.IsMusicFile(file))
+                    {
+                        var fn = Path.GetFileNameWithoutExtension(file);
+                        musics.Add(fn);
+                    }
+                }
+            }
+            return musics;
+        }
+
+        List<string> SearchForInvalidLrcs(string lrcSrc, string musicSrc)
+        {
             var result = new List<string>();
-            if (!Directory.Exists(folder))
+            var musics = SearchMusics(musicSrc);
+            var folders = Utils.Tools.SplitFolders(lrcSrc);
+            foreach (var folder in folders)
             {
-                return result;
-            }
-
-            var files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
-            var oths = new List<string>();
-            foreach (var file in files)
-            {
-                if (Utils.Tools.IsMusicFile(file))
+                if (!Directory.Exists(folder))
                 {
-                    musics.Add(Path.ChangeExtension(file, null));
+                    continue;
                 }
-                else
+                var files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
+                foreach (var file in files)
                 {
-                    oths.Add(file);
-                }
-            }
-
-            foreach (var oth in oths)
-            {
-                var o = Path.ChangeExtension(oth, null);
-                if (!musics.Contains(o))
-                {
-                    result.Add(oth);
+                    if (Utils.Tools.IsLrcFile(file))
+                    {
+                        var fn = Path.GetFileNameWithoutExtension(file);
+                        if (!musics.Contains(fn))
+                        {
+                            result.Add(file);
+                        }
+                    }
                 }
             }
             return result;

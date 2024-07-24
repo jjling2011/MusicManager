@@ -12,7 +12,7 @@ namespace MusicManager.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.10.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -122,12 +122,24 @@ namespace MusicManager.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("C:\\")]
-        public string jntrSrcFolder {
+        public string jntrLrcFolder {
             get {
-                return ((string)(this["jntrSrcFolder"]));
+                return ((string)(this["jntrLrcFolder"]));
             }
             set {
-                this["jntrSrcFolder"] = value;
+                this["jntrLrcFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\")]
+        public string jntrMusicFolder {
+            get {
+                return ((string)(this["jntrMusicFolder"]));
+            }
+            set {
+                this["jntrMusicFolder"] = value;
             }
         }
     }
