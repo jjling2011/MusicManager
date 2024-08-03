@@ -21,7 +21,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.1.9";
+            this.Text = "Music manager v0.2.0";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -44,6 +44,21 @@ namespace MusicManager.Views
                     logger.Log($"{ext}: {file}");
                 }
             }
+        }
+
+        private void detectSilentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToggleBtnState(false);
+
+            var src = tboxSrcFolder.Text;
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(() =>
+            {
+                DetectSilence(src, cts.Token);
+                ToggleBtnState(true);
+            });
         }
 
         private void btnMore_Click(object sender, EventArgs e)
@@ -334,6 +349,52 @@ namespace MusicManager.Views
             logger.Log($"[mv] {src} -> {dest}");
             File.Move(src, dest);
             return true;
+        }
+
+        void DetectSilence(string sources, CancellationToken token)
+        {
+            var cTotal = 0;
+            var cSilence = 0;
+
+            var folders = Utils.Tools.SplitFolders(sources);
+            foreach (var folder in folders)
+            {
+                if (!Directory.Exists(folder))
+                {
+                    logger.Log($"Dir not exists: {folder}");
+                    continue;
+                }
+
+                logger.Log($"Detecting folder: {folder}");
+                var musics = new List<string>();
+                foreach (
+                    string file in Directory.EnumerateFiles(
+                        folder,
+                        "*.*",
+                        SearchOption.AllDirectories
+                    )
+                )
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        logger.Log("Stop by user");
+                        logger.Log($"Total: {cTotal}, Detected: {cSilence}");
+                        return;
+                    }
+                    if (!Utils.Tools.IsMusicFile(file))
+                    {
+                        continue;
+                    }
+                    cTotal++;
+                    var ms = Comps.SilenceDetector.GetSilenceStartMS(file);
+                    if (ms > 2 * 1000)
+                    {
+                        cSilence++;
+                        logger.Log($"[{cTotal}]({ms}ms) {file}");
+                    }
+                }
+            }
+            logger.Log($"Total: {cTotal}, Detected: {cSilence}");
         }
 
         void RenameFolders(string src, CancellationToken token)

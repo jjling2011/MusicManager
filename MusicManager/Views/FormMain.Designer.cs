@@ -47,6 +47,7 @@ namespace MusicManager.Views
             this.ctxMenuStripMore = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.tagsEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.janitorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.detectSilentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxMenuStripMore.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -189,9 +190,10 @@ namespace MusicManager.Views
             // 
             this.ctxMenuStripMore.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tagsEditorToolStripMenuItem,
-            this.janitorToolStripMenuItem});
+            this.janitorToolStripMenuItem,
+            this.detectSilentToolStripMenuItem});
             this.ctxMenuStripMore.Name = "ctxMenuStripMore";
-            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 70);
+            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 92);
             // 
             // tagsEditorToolStripMenuItem
             // 
@@ -206,6 +208,13 @@ namespace MusicManager.Views
             this.janitorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.janitorToolStripMenuItem.Text = "janitor";
             this.janitorToolStripMenuItem.Click += new System.EventHandler(this.janitorToolStripMenuItem_Click);
+            // 
+            // detectSilentToolStripMenuItem
+            // 
+            this.detectSilentToolStripMenuItem.Name = "detectSilentToolStripMenuItem";
+            this.detectSilentToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.detectSilentToolStripMenuItem.Text = "detect silence";
+            this.detectSilentToolStripMenuItem.Click += new System.EventHandler(this.detectSilentToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -252,6 +261,7 @@ namespace MusicManager.Views
         private System.Windows.Forms.ContextMenuStrip ctxMenuStripMore;
         private System.Windows.Forms.ToolStripMenuItem tagsEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem janitorToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem detectSilentToolStripMenuItem;
     }
 }
 
