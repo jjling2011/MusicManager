@@ -48,6 +48,7 @@ namespace MusicManager.Views
             this.tagsEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.janitorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.detectSilentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeSilenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxMenuStripMore.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -191,9 +192,10 @@ namespace MusicManager.Views
             this.ctxMenuStripMore.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tagsEditorToolStripMenuItem,
             this.janitorToolStripMenuItem,
-            this.detectSilentToolStripMenuItem});
+            this.detectSilentToolStripMenuItem,
+            this.removeSilenceToolStripMenuItem});
             this.ctxMenuStripMore.Name = "ctxMenuStripMore";
-            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 92);
+            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 114);
             // 
             // tagsEditorToolStripMenuItem
             // 
@@ -215,6 +217,13 @@ namespace MusicManager.Views
             this.detectSilentToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.detectSilentToolStripMenuItem.Text = "detect silence";
             this.detectSilentToolStripMenuItem.Click += new System.EventHandler(this.detectSilentToolStripMenuItem_Click);
+            // 
+            // removeSilenceToolStripMenuItem
+            // 
+            this.removeSilenceToolStripMenuItem.Name = "removeSilenceToolStripMenuItem";
+            this.removeSilenceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.removeSilenceToolStripMenuItem.Text = "remove silence";
+            this.removeSilenceToolStripMenuItem.Click += new System.EventHandler(this.removeSilenceToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -262,6 +271,7 @@ namespace MusicManager.Views
         private System.Windows.Forms.ToolStripMenuItem tagsEditorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem janitorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem detectSilentToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeSilenceToolStripMenuItem;
     }
 }
 

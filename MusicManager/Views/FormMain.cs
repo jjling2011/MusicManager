@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.2.0";
+            this.Text = "Music manager v0.2.1";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -44,6 +45,21 @@ namespace MusicManager.Views
                     logger.Log($"{ext}: {file}");
                 }
             }
+        }
+
+        private void removeSilenceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ToggleBtnState(false);
+
+            var src = tboxSrcFolder.Text;
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(() =>
+            {
+                RemoveSilence(src, cts.Token);
+                ToggleBtnState(true);
+            });
         }
 
         private void detectSilentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -255,18 +271,6 @@ namespace MusicManager.Views
             return file;
         }
 
-        void MoveFileToFolder(string srcFile, string destFolder)
-        {
-            var filename = Path.GetFileName(srcFile);
-            var destFile = Path.Combine(destFolder, filename);
-            if (File.Exists(destFile))
-            {
-                File.Delete(destFile);
-            }
-            logger.Log($"[mv] {srcFile} to {destFile}");
-            File.Move(srcFile, destFile);
-        }
-
         string invalidFilenameChars =
             new string(Path.GetInvalidFileNameChars()) + new string(Path.GetInvalidPathChars());
 
@@ -349,6 +353,75 @@ namespace MusicManager.Views
             logger.Log($"[mv] {src} -> {dest}");
             File.Move(src, dest);
             return true;
+        }
+
+        void RemoveSilence(string sources, CancellationToken token)
+        {
+            if (!Utils.Tools.IsFfmpegExists())
+            {
+                logger.Log($"\"{Utils.Tools.ffmpeg_exe}\" not found!");
+                logger.Log($"please download ffmpeg.exe to \"tools\" folder");
+                return;
+            }
+
+            Utils.Tools.CreateTempDir();
+
+            var cOk = 0;
+            var cFail = 0;
+            var cTotal = 0;
+
+            var folders = Utils.Tools.SplitFolders(sources);
+            foreach (var folder in folders)
+            {
+                if (!Directory.Exists(folder))
+                {
+                    logger.Log($"Dir not exists: {folder}");
+                    continue;
+                }
+
+                logger.Log($"Processing folder: {folder}");
+                var musics = new List<string>();
+                foreach (
+                    string file in Directory.EnumerateFiles(
+                        folder,
+                        "*.*",
+                        SearchOption.AllDirectories
+                    )
+                )
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        logger.Log("Stop by user");
+                        goto labelEscape;
+                    }
+
+                    if (!Utils.Tools.IsMusicFile(file))
+                    {
+                        continue;
+                    }
+
+                    cTotal++;
+                    var ms = Comps.SilenceDetector.GetSilenceStartMS(file);
+                    if (ms < 2 * 1000)
+                    {
+                        continue;
+                    }
+
+                    if (Utils.Tools.RemoveSilence(logger, file, ms))
+                    {
+                        cOk++;
+                    }
+                    else
+                    {
+                        cFail++;
+                    }
+                }
+            }
+
+            labelEscape:
+            logger.Log(
+                $"Total: {cTotal} Success: {cOk} Fail: {cFail} Skip: {cTotal - cOk - cFail}"
+            );
         }
 
         void DetectSilence(string sources, CancellationToken token)
@@ -509,7 +582,7 @@ namespace MusicManager.Views
                         cNew++;
                         continue;
                     }
-                    MoveFileToFolder(dupFile, dup);
+                    Utils.Tools.MoveFileToFolder(logger, dupFile, dup);
                     cDup++;
                 }
             }

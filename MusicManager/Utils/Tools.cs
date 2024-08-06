@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicManager.Comps;
 
 namespace MusicManager.Utils
 {
@@ -22,6 +24,70 @@ namespace MusicManager.Utils
             {
                 musicExtensions.Add($".{format.ToLower()}");
             }
+        }
+
+        public static readonly string ffmpeg_exe = "tools\\ffmpeg.exe";
+        public static readonly string temp_dir = Path.Combine(Path.GetTempPath(), "MusicManager");
+
+        public static void CreateTempDir()
+        {
+            if (!Directory.Exists(temp_dir))
+            {
+                Directory.CreateDirectory(temp_dir);
+            }
+        }
+
+        public static bool IsFfmpegExists()
+        {
+            return File.Exists(ffmpeg_exe);
+        }
+
+        public static bool RemoveSilence(Logger logger, string path, int ms)
+        {
+            logger.Log($"[cut] {path}");
+            var filename = Path.GetFileName(path);
+            var tmpdir = Path.Combine(temp_dir, filename);
+            var ss = 1.0 * ms / 1000;
+            var args = $"-i \"{path}\" -c copy -ss {ss} \"{tmpdir}\"";
+
+            logger.Log($"at: {ms}ms");
+            // logger.Log($"cmd: {ffmpeg_exe} {args}");
+            var ps = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = ffmpeg_exe,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                },
+            };
+
+            ps.Start();
+            ps.WaitForExit();
+            if (ps.ExitCode == 0)
+            {
+                var dir = Path.GetDirectoryName(path);
+                MoveFileToFolder(logger, tmpdir, dir);
+                logger.Log($"result: success");
+                return true;
+            }
+
+            logger.Log($"result: fail");
+            return false;
+        }
+
+        public static void MoveFileToFolder(Logger logger, string srcFile, string destFolder)
+        {
+            var filename = Path.GetFileName(srcFile);
+            var destFile = Path.Combine(destFolder, filename);
+            if (File.Exists(destFile))
+            {
+                File.Delete(destFile);
+            }
+            logger.Log($"move: {srcFile}");
+            logger.Log($"to: {destFile}");
+            File.Move(srcFile, destFile);
         }
 
         static readonly char pathSpliter = '|';
