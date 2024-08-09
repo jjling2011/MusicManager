@@ -39,9 +39,10 @@ namespace MusicManager.Views
             this.btnCancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnBrowseMusicFolders = new System.Windows.Forms.Button();
-            this.mrichFilePaths = new MusicManager.Comps.MyRichTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tboxMusicFolders = new System.Windows.Forms.TextBox();
+            this.btnNonMusic = new System.Windows.Forms.Button();
+            this.mrichFilePaths = new MusicManager.Comps.MyRichTextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -79,7 +80,7 @@ namespace MusicManager.Views
             // btnSearch
             // 
             this.btnSearch.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnSearch.Location = new System.Drawing.Point(221, 378);
+            this.btnSearch.Location = new System.Drawing.Point(180, 378);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(75, 23);
             this.btnSearch.TabIndex = 4;
@@ -91,7 +92,7 @@ namespace MusicManager.Views
             // btnRemove
             // 
             this.btnRemove.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnRemove.Location = new System.Drawing.Point(302, 378);
+            this.btnRemove.Location = new System.Drawing.Point(342, 378);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
             this.btnRemove.TabIndex = 5;
@@ -103,7 +104,7 @@ namespace MusicManager.Views
             // btnCancel
             // 
             this.btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.btnCancel.Location = new System.Drawing.Point(383, 378);
+            this.btnCancel.Location = new System.Drawing.Point(423, 378);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 6;
@@ -124,17 +125,6 @@ namespace MusicManager.Views
             this.btnBrowseMusicFolders.UseVisualStyleBackColor = true;
             this.btnBrowseMusicFolders.Click += new System.EventHandler(this.btnBrowseMusicFolders_Click);
             // 
-            // mrichFilePaths
-            // 
-            this.mrichFilePaths.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.mrichFilePaths.Location = new System.Drawing.Point(14, 66);
-            this.mrichFilePaths.Name = "mrichFilePaths";
-            this.mrichFilePaths.Size = new System.Drawing.Size(652, 306);
-            this.mrichFilePaths.TabIndex = 2;
-            this.mrichFilePaths.Text = "";
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -154,6 +144,29 @@ namespace MusicManager.Views
             this.tboxMusicFolders.TabIndex = 1;
             this.tboxMusicFolders.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tboxMusicFolders_KeyDown);
             // 
+            // btnNonMusic
+            // 
+            this.btnNonMusic.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.btnNonMusic.Location = new System.Drawing.Point(261, 378);
+            this.btnNonMusic.Name = "btnNonMusic";
+            this.btnNonMusic.Size = new System.Drawing.Size(75, 23);
+            this.btnNonMusic.TabIndex = 4;
+            this.btnNonMusic.Text = "NonMusic";
+            this.toolTip1.SetToolTip(this.btnNonMusic, "Search for non-music files.");
+            this.btnNonMusic.UseVisualStyleBackColor = true;
+            this.btnNonMusic.Click += new System.EventHandler(this.btnNonMusic_Click);
+            // 
+            // mrichFilePaths
+            // 
+            this.mrichFilePaths.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mrichFilePaths.Location = new System.Drawing.Point(14, 66);
+            this.mrichFilePaths.Name = "mrichFilePaths";
+            this.mrichFilePaths.Size = new System.Drawing.Size(652, 306);
+            this.mrichFilePaths.TabIndex = 2;
+            this.mrichFilePaths.Text = "";
+            // 
             // FormJanitor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -161,6 +174,7 @@ namespace MusicManager.Views
             this.ClientSize = new System.Drawing.Size(678, 413);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnRemove);
+            this.Controls.Add(this.btnNonMusic);
             this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.btnBrowseMusicFolders);
             this.Controls.Add(this.btnBrowseLrcFolder);
@@ -192,5 +206,6 @@ namespace MusicManager.Views
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox tboxMusicFolders;
         private System.Windows.Forms.Button btnBrowseMusicFolders;
+        private System.Windows.Forms.Button btnNonMusic;
     }
 }

@@ -67,6 +67,25 @@ namespace MusicManager.Views
             Properties.Settings.Default.Save();
         }
 
+        private void btnNonMusic_Click(object sender, EventArgs e)
+        {
+            btnNonMusic.Enabled = false;
+            var musicFolders = tboxMusicFolders.Text;
+            Task.Run(() =>
+            {
+                var files = SearchFiles(musicFolders, false, false);
+                btnNonMusic.Invoke(
+                    (MethodInvoker)
+                        delegate
+                        {
+                            mrichFilePaths.Text = string.Join(Environment.NewLine, files);
+                            btnNonMusic.Enabled = true;
+                            MessageBox.Show($"Total: {files.Count} files");
+                        }
+                );
+            });
+        }
+
         private void btnSearch_Click(object sender, EventArgs e)
         {
             btnSearch.Enabled = false;
@@ -163,10 +182,10 @@ namespace MusicManager.Views
         #endregion
 
         #region private
-        HashSet<string> SearchMusics(string musicSrc)
+        HashSet<string> SearchFiles(string srcs, bool isMusic, bool filenameOnly)
         {
             var musics = new HashSet<string>();
-            var folders = Utils.Tools.SplitFolders(musicSrc);
+            var folders = Utils.Tools.SplitFolders(srcs);
             foreach (var folder in folders)
             {
                 if (!Directory.Exists(folder))
@@ -176,10 +195,17 @@ namespace MusicManager.Views
                 var files = Directory.GetFiles(folder, "*.*", SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
-                    if (Utils.Tools.IsMusicFile(file))
+                    if (!(isMusic ^ Utils.Tools.IsMusicFile(file)))
                     {
-                        var fn = Path.GetFileNameWithoutExtension(file);
-                        musics.Add(fn);
+                        if (filenameOnly)
+                        {
+                            var fn = Path.GetFileNameWithoutExtension(file);
+                            musics.Add(fn);
+                        }
+                        else
+                        {
+                            musics.Add(file);
+                        }
                     }
                 }
             }
@@ -189,7 +215,7 @@ namespace MusicManager.Views
         List<string> SearchForInvalidLrcs(string lrcSrc, string musicSrc)
         {
             var result = new List<string>();
-            var musics = SearchMusics(musicSrc);
+            var musics = SearchFiles(musicSrc, true, true);
             var folders = Utils.Tools.SplitFolders(lrcSrc);
             foreach (var folder in folders)
             {
