@@ -229,6 +229,8 @@ namespace MusicManager.Views
                     {
                         btnDedup.Enabled = isEnable;
                         btnRename.Enabled = isEnable;
+                        removeSilenceToolStripMenuItem.Enabled = isEnable;
+                        detectSilentToolStripMenuItem.Enabled = isEnable;
                     }
             );
         }
@@ -415,30 +417,22 @@ namespace MusicManager.Views
                         continue;
                     }
 
-                    logger.Log($"[cut] #{cTotal} file: {file}");
+                    logger.Log($"[cut ] #{cTotal} silence: {totalSilence}ms file: {file}");
+                    var ss = 1.0 * info.GetStartSilenceMs() / 1000;
+                    var t = 1.0 * info.GetVolumeDurationMs() / 1000;
+                    var tail = 1.0 * info.GetEndSilenceMs() / 1000;
                     logger.Log(
-                        string.Format(
-                            "start: {0}ms volume: {1}ms tail: {2}ms total: {3}ms",
-                            info.GetStartSilenceMs(),
-                            info.GetVolumeDurationMs(),
-                            info.GetEndSilenceMs(),
-                            info.GetMusicEndMs()
-                        )
+                        $"start: {ss}s tail: {tail}s duration: {t}s total: {ss + t + tail}s"
                     );
 
-                    if (
-                        Utils.Tools.RemoveSilence(
-                            logger,
-                            file,
-                            info.GetStartSilenceMs(),
-                            info.GetVolumeDurationMs()
-                        )
-                    )
+                    if (Utils.Tools.RemoveSilence(logger, file, ss, t))
                     {
+                        logger.Log($"result: success");
                         cOk++;
                     }
                     else
                     {
+                        logger.Log($"result: fail");
                         cFail++;
                     }
                 }
@@ -489,8 +483,17 @@ namespace MusicManager.Views
                     if (info != null && info.GetTotalSilenceMs() > MAX_TOTAL_SILENCE)
                     {
                         cSilence++;
+                        var head = 1.0 * info.GetStartSilenceMs() / 1000;
+                        var tail = 1.0 * info.GetEndSilenceMs() / 1000;
                         logger.Log(
-                            $"[{cTotal}]({info.GetStartSilenceMs()} + {info.GetEndSilenceMs()} = {info.GetTotalSilenceMs()})ms {file}"
+                            string.Format(
+                                "[detect] #{0} ({1} + {2} = {3}s) file: {4}",
+                                cTotal,
+                                head,
+                                tail,
+                                head + tail,
+                                file
+                            )
                         );
                     }
                 }
