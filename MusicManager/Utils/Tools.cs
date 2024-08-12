@@ -42,16 +42,19 @@ namespace MusicManager.Utils
             return File.Exists(ffmpeg_exe);
         }
 
-        public static bool RemoveSilence(Logger logger, string path, int ms)
+        public static bool RemoveSilence(Logger logger, string path, int ssMs, int tMs)
         {
-            logger.Log($"[cut] {path}");
             var filename = Path.GetFileName(path);
             var tmpdir = Path.Combine(temp_dir, filename);
-            var ss = 1.0 * ms / 1000;
-            var args = $"-i \"{path}\" -c copy -ss {ss} \"{tmpdir}\"";
 
-            logger.Log($"at: {ms}ms");
+            var ss = 1.0 * ssMs / 1000;
+            var t = 1.0 * tMs / 1000;
+            var args = $"-i \"{path}\" -c copy -ss {ss} -t {t} \"{tmpdir}\"";
+
+            logger.Log($"cut at: {ss}s dur: {t}s");
+
             // logger.Log($"cmd: {ffmpeg_exe} {args}");
+
             var ps = new Process()
             {
                 StartInfo = new ProcessStartInfo()

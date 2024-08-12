@@ -15,6 +15,7 @@ namespace MusicManager.Views
 {
     public partial class FormMain : Form
     {
+        readonly int MAX_TOTAL_SILENCE = 1000; // ms
         CancellationTokenSource cts;
         readonly Comps.Logger logger = null;
 
@@ -22,7 +23,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.2.2";
+            this.Text = "Music manager v0.2.3";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -49,6 +50,11 @@ namespace MusicManager.Views
 
         private void removeSilenceToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!Utils.UI.Confirm("Remove head and tail silences of all musice?"))
+            {
+                return;
+            }
+
             ToggleBtnState(false);
 
             var src = tboxSrcFolder.Text;
@@ -401,13 +407,33 @@ namespace MusicManager.Views
                     }
 
                     cTotal++;
-                    var ms = Comps.SilenceDetector.GetSilenceStartMS(file);
-                    if (ms < 2 * 1000)
+                    var info = Comps.SilenceDetector.GetSilenceInfos(file);
+                    var totalSilence = info.GetTotalSilenceMs();
+                    if (info == null || totalSilence < MAX_TOTAL_SILENCE)
                     {
+                        logger.Log($"[skip] #{cTotal} silence: {totalSilence}ms file: {file}");
                         continue;
                     }
 
-                    if (Utils.Tools.RemoveSilence(logger, file, ms))
+                    logger.Log($"[cut] #{cTotal} file: {file}");
+                    logger.Log(
+                        string.Format(
+                            "start: {0}ms volume: {1}ms tail: {2}ms total: {3}ms",
+                            info.GetStartSilenceMs(),
+                            info.GetVolumeDurationMs(),
+                            info.GetEndSilenceMs(),
+                            info.GetMusicEndMs()
+                        )
+                    );
+
+                    if (
+                        Utils.Tools.RemoveSilence(
+                            logger,
+                            file,
+                            info.GetStartSilenceMs(),
+                            info.GetVolumeDurationMs()
+                        )
+                    )
                     {
                         cOk++;
                     }
@@ -459,11 +485,13 @@ namespace MusicManager.Views
                         continue;
                     }
                     cTotal++;
-                    var ms = Comps.SilenceDetector.GetSilenceStartMS(file);
-                    if (ms > 2 * 1000)
+                    var info = Comps.SilenceDetector.GetSilenceInfos(file);
+                    if (info != null && info.GetTotalSilenceMs() > MAX_TOTAL_SILENCE)
                     {
                         cSilence++;
-                        logger.Log($"[{cTotal}]({ms}ms) {file}");
+                        logger.Log(
+                            $"[{cTotal}]({info.GetStartSilenceMs()} + {info.GetEndSilenceMs()} = {info.GetTotalSilenceMs()})ms {file}"
+                        );
                     }
                 }
             }
