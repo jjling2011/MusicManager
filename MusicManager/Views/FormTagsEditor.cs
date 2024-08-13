@@ -69,7 +69,10 @@ namespace MusicManager.Views
                 tag = GetTagFromFile(idx, file);
             }
             catch { }
+
             lbMatching.Text = tag;
+            toolTip1.SetToolTip(lbMatching, tag);
+
             UpdatePreviews();
         }
 
