@@ -35,6 +35,10 @@ namespace MusicManager.Views
             this.tboxFolder = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lbTitle = new System.Windows.Forms.Label();
+            this.lbAlbum = new System.Windows.Forms.Label();
+            this.lbArtist = new System.Windows.Forms.Label();
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.checkAlbum = new System.Windows.Forms.CheckBox();
             this.checkArtist = new System.Windows.Forms.CheckBox();
             this.checkTitle = new System.Windows.Forms.CheckBox();
@@ -53,7 +57,8 @@ namespace MusicManager.Views
             this.btnClear = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.lbMatching = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -93,6 +98,11 @@ namespace MusicManager.Views
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox1.Controls.Add(this.lbMatching);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.lbTitle);
+            this.groupBox1.Controls.Add(this.lbAlbum);
+            this.groupBox1.Controls.Add(this.lbArtist);
             this.groupBox1.Controls.Add(this.richTextBox1);
             this.groupBox1.Controls.Add(this.checkAlbum);
             this.groupBox1.Controls.Add(this.checkArtist);
@@ -107,10 +117,51 @@ namespace MusicManager.Views
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Modify";
             // 
+            // lbTitle
+            // 
+            this.lbTitle.AutoSize = true;
+            this.lbTitle.Location = new System.Drawing.Point(72, 130);
+            this.lbTitle.Name = "lbTitle";
+            this.lbTitle.Size = new System.Drawing.Size(113, 12);
+            this.lbTitle.TabIndex = 3;
+            this.lbTitle.Text = "Preview for title.";
+            this.toolTip1.SetToolTip(this.lbTitle, "Preview for title.");
+            // 
+            // lbAlbum
+            // 
+            this.lbAlbum.AutoSize = true;
+            this.lbAlbum.Location = new System.Drawing.Point(72, 184);
+            this.lbAlbum.Name = "lbAlbum";
+            this.lbAlbum.Size = new System.Drawing.Size(113, 12);
+            this.lbAlbum.TabIndex = 3;
+            this.lbAlbum.Text = "Preview for album.";
+            this.toolTip1.SetToolTip(this.lbAlbum, "Preview for album.");
+            // 
+            // lbArtist
+            // 
+            this.lbArtist.AutoSize = true;
+            this.lbArtist.Location = new System.Drawing.Point(72, 76);
+            this.lbArtist.Name = "lbArtist";
+            this.lbArtist.Size = new System.Drawing.Size(119, 12);
+            this.lbArtist.TabIndex = 3;
+            this.lbArtist.Text = "Preview for artist.";
+            this.toolTip1.SetToolTip(this.lbArtist, "Preview for artist.");
+            // 
+            // richTextBox1
+            // 
+            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.richTextBox1.Location = new System.Drawing.Point(6, 223);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.ReadOnly = true;
+            this.richTextBox1.Size = new System.Drawing.Size(248, 92);
+            this.richTextBox1.TabIndex = 2;
+            this.richTextBox1.Text = " ** Tags which are selected above, will be replaced by the following algorithm:\n\n" +
+    "(C#) Regex.Replace({source}, {source regex}, {tag regex})";
+            // 
             // checkAlbum
             // 
             this.checkAlbum.AutoSize = true;
-            this.checkAlbum.Location = new System.Drawing.Point(6, 74);
+            this.checkAlbum.Location = new System.Drawing.Point(6, 155);
             this.checkAlbum.Name = "checkAlbum";
             this.checkAlbum.Size = new System.Drawing.Size(54, 16);
             this.checkAlbum.TabIndex = 0;
@@ -121,7 +172,7 @@ namespace MusicManager.Views
             // checkArtist
             // 
             this.checkArtist.AutoSize = true;
-            this.checkArtist.Location = new System.Drawing.Point(6, 20);
+            this.checkArtist.Location = new System.Drawing.Point(6, 47);
             this.checkArtist.Name = "checkArtist";
             this.checkArtist.Size = new System.Drawing.Size(60, 16);
             this.checkArtist.TabIndex = 0;
@@ -132,7 +183,7 @@ namespace MusicManager.Views
             // checkTitle
             // 
             this.checkTitle.AutoSize = true;
-            this.checkTitle.Location = new System.Drawing.Point(6, 47);
+            this.checkTitle.Location = new System.Drawing.Point(6, 101);
             this.checkTitle.Name = "checkTitle";
             this.checkTitle.Size = new System.Drawing.Size(54, 16);
             this.checkTitle.TabIndex = 0;
@@ -142,7 +193,7 @@ namespace MusicManager.Views
             // 
             // tboxAlbum
             // 
-            this.tboxAlbum.Location = new System.Drawing.Point(72, 72);
+            this.tboxAlbum.Location = new System.Drawing.Point(72, 153);
             this.tboxAlbum.Name = "tboxAlbum";
             this.tboxAlbum.Size = new System.Drawing.Size(182, 21);
             this.tboxAlbum.TabIndex = 1;
@@ -150,7 +201,7 @@ namespace MusicManager.Views
             // 
             // tboxTitle
             // 
-            this.tboxTitle.Location = new System.Drawing.Point(72, 45);
+            this.tboxTitle.Location = new System.Drawing.Point(72, 99);
             this.tboxTitle.Name = "tboxTitle";
             this.tboxTitle.Size = new System.Drawing.Size(182, 21);
             this.tboxTitle.TabIndex = 1;
@@ -158,7 +209,7 @@ namespace MusicManager.Views
             // 
             // tboxArtist
             // 
-            this.tboxArtist.Location = new System.Drawing.Point(72, 18);
+            this.tboxArtist.Location = new System.Drawing.Point(72, 45);
             this.tboxArtist.Name = "tboxArtist";
             this.tboxArtist.Size = new System.Drawing.Size(182, 21);
             this.tboxArtist.TabIndex = 1;
@@ -293,16 +344,23 @@ namespace MusicManager.Views
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
-            // richTextBox1
+            // label4
             // 
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(6, 99);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(248, 216);
-            this.richTextBox1.TabIndex = 2;
-            this.richTextBox1.Text = " ** Tags which are selected above, will be replaced by the following algorithm:\n\n" +
-    "(C#) Regex.Replace({source}, {source regex}, {tag regex})";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 23);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(59, 12);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "Matching:";
+            // 
+            // lbMatching
+            // 
+            this.lbMatching.AutoSize = true;
+            this.lbMatching.Location = new System.Drawing.Point(70, 23);
+            this.lbMatching.Name = "lbMatching";
+            this.lbMatching.Size = new System.Drawing.Size(23, 12);
+            this.lbMatching.TabIndex = 4;
+            this.lbMatching.Text = "...";
             // 
             // FormTagsEditor
             // 
@@ -361,5 +419,10 @@ namespace MusicManager.Views
         private System.Windows.Forms.Button btnStop;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.Label lbArtist;
+        private System.Windows.Forms.Label lbTitle;
+        private System.Windows.Forms.Label lbAlbum;
+        private System.Windows.Forms.Label lbMatching;
+        private System.Windows.Forms.Label label4;
     }
 }

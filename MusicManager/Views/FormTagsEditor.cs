@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -34,6 +35,7 @@ namespace MusicManager.Views
         }
 
         #region UI handler
+
         private void btnClose_Click(object sender, EventArgs e)
         {
             cts?.Cancel();
@@ -53,34 +55,56 @@ namespace MusicManager.Views
             Properties.Settings.Default.tagsEditorSrcFolder = folder;
             Properties.Settings.Default.Save();
         }
+
         private void cboxSource_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.tagsEditorIndex = (sender as ComboBox).SelectedIndex;
+            var idx = (sender as ComboBox).SelectedIndex;
+            Properties.Settings.Default.tagsEditorIndex = idx;
             Properties.Settings.Default.Save();
+
+            var tag = "";
+            try
+            {
+                var file = GetFirstMusic();
+                tag = GetTagFromFile(idx, file);
+            }
+            catch { }
+            lbMatching.Text = tag;
+            UpdatePreviews();
         }
+
         private void tboxArtist_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.tagsEditorArtistRegex = (sender as TextBox).Text;
             Properties.Settings.Default.Save();
+
+            UpdatePreviews();
         }
 
         private void tboxTitle_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.tagsEditorTitleRegex = (sender as TextBox).Text;
             Properties.Settings.Default.Save();
+
+            UpdatePreviews();
         }
 
         private void tboxAlbum_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.tagsEditorAlbumRegex = (sender as TextBox).Text;
             Properties.Settings.Default.Save();
+
+            UpdatePreviews();
         }
 
         private void tboxRegex_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.tagsEditorSrcRegex = (sender as TextBox).Text;
             Properties.Settings.Default.Save();
+
+            UpdatePreviews();
         }
+
         private void tboxFolder_TextChanged(object sender, EventArgs e)
         {
             Properties.Settings.Default.tagsEditorSrcFolder = (sender as TextBox).Text;
@@ -88,12 +112,11 @@ namespace MusicManager.Views
         }
 
         CancellationTokenSource cts = null;
+
         private void btnModify_Click(object sender, EventArgs e)
         {
             ProcessFolder(false);
         }
-
-
 
         private void btnTest_Click(object sender, EventArgs e)
         {
@@ -138,10 +161,56 @@ namespace MusicManager.Views
             });
         }
 
-        void ModifyMusicFiles(bool isDryRun, string src, int index, string regex, string artist, string title, string album,
-            CancellationToken token)
+        void TryUpdatePreview(Label label, TextBox tbox)
         {
-            foreach (string file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories))
+            var tag = lbMatching.Text;
+            var matchRegex = tboxRegex.Text;
+            var repalceRegex = tbox.Text;
+            var text = "";
+            try
+            {
+                text = Regex.Replace(tag, matchRegex, repalceRegex);
+            }
+            catch { }
+            label.Text = text;
+        }
+
+        void UpdatePreviews()
+        {
+            TryUpdatePreview(lbArtist, tboxArtist);
+            TryUpdatePreview(lbAlbum, tboxAlbum);
+            TryUpdatePreview(lbTitle, tboxTitle);
+        }
+
+        string GetFirstMusic()
+        {
+            var src = tboxFolder.Text;
+            foreach (
+                string file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories)
+            )
+            {
+                if (Utils.Tools.IsMusicFile(file))
+                {
+                    return file;
+                }
+            }
+            throw new Exception("find no music file");
+        }
+
+        void ModifyMusicFiles(
+            bool isDryRun,
+            string src,
+            int index,
+            string regex,
+            string artist,
+            string title,
+            string album,
+            CancellationToken token
+        )
+        {
+            foreach (
+                string file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories)
+            )
             {
                 if (token.IsCancellationRequested)
                 {
@@ -162,7 +231,15 @@ namespace MusicManager.Views
             }
         }
 
-        void ModifyTags(bool isDryRun, int index, string file, string regex, string artist, string title, string album)
+        void ModifyTags(
+            bool isDryRun,
+            int index,
+            string file,
+            string regex,
+            string artist,
+            string title,
+            string album
+        )
         {
             logger.Log($"File: {file}");
             var tag = GetTagFromFile(index, file);
