@@ -35,6 +35,12 @@ namespace MusicManager.Views
         }
 
         #region UI handler
+        private void btnPickRandomMusic_Click(object sender, EventArgs e)
+        {
+            var idx = cboxSource.SelectedIndex;
+            UpdateMatchingText(idx);
+            UpdatePreviews();
+        }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
@@ -62,17 +68,7 @@ namespace MusicManager.Views
             Properties.Settings.Default.tagsEditorIndex = idx;
             Properties.Settings.Default.Save();
 
-            var tag = "";
-            try
-            {
-                var file = GetFirstMusic();
-                tag = GetTagFromFile(idx, file);
-            }
-            catch { }
-
-            lbMatching.Text = tag;
-            toolTip1.SetToolTip(lbMatching, tag);
-
+            UpdateMatchingText(idx);
             UpdatePreviews();
         }
 
@@ -175,7 +171,8 @@ namespace MusicManager.Views
                 text = Regex.Replace(tag, matchRegex, repalceRegex);
             }
             catch { }
-            label.Text = text;
+            label.Text = $"\"{text}\"";
+            toolTip1.SetToolTip(label, label.Text);
         }
 
         void UpdatePreviews()
@@ -185,17 +182,31 @@ namespace MusicManager.Views
             TryUpdatePreview(lbTitle, tboxTitle);
         }
 
-        string GetFirstMusic()
+        string PickOneRandomMusic()
         {
             var src = tboxFolder.Text;
-            foreach (
-                string file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories)
-            )
+
+            var r = new Random(Guid.NewGuid().GetHashCode());
+            var c = 1;
+            var pick = "";
+
+            foreach (var file in Directory.EnumerateFiles(src, "*.*", SearchOption.AllDirectories))
             {
-                if (Utils.Tools.IsMusicFile(file))
+                if (!Utils.Tools.IsMusicFile(file))
                 {
-                    return file;
+                    continue;
                 }
+
+                // https://stackoverflow.com/questions/32328620/read-random-line-from-a-large-text-file
+                if (r.Next(c) == 0)
+                {
+                    pick = file;
+                }
+                c++;
+            }
+            if (!string.IsNullOrEmpty(pick))
+            {
+                return pick;
             }
             throw new Exception("find no music file");
         }
@@ -279,6 +290,20 @@ namespace MusicManager.Views
             {
                 music.Save();
             }
+        }
+
+        void UpdateMatchingText(int idx)
+        {
+            var tag = "";
+            try
+            {
+                var file = PickOneRandomMusic();
+                tag = GetTagFromFile(idx, file);
+            }
+            catch { }
+
+            lbMatching.Text = tag;
+            toolTip1.SetToolTip(lbMatching, tag);
         }
 
         private string GetTagFromFile(int index, string file)

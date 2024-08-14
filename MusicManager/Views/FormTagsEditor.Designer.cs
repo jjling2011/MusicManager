@@ -35,8 +35,6 @@ namespace MusicManager.Views
             this.tboxFolder = new System.Windows.Forms.TextBox();
             this.btnBrowse = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.lbMatching = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
             this.lbTitle = new System.Windows.Forms.Label();
             this.lbAlbum = new System.Windows.Forms.Label();
             this.lbArtist = new System.Windows.Forms.Label();
@@ -47,6 +45,8 @@ namespace MusicManager.Views
             this.tboxAlbum = new System.Windows.Forms.TextBox();
             this.tboxTitle = new System.Windows.Forms.TextBox();
             this.tboxArtist = new System.Windows.Forms.TextBox();
+            this.lbMatching = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.cboxSource = new System.Windows.Forms.ComboBox();
             this.tboxRegex = new System.Windows.Forms.TextBox();
@@ -59,6 +59,7 @@ namespace MusicManager.Views
             this.btnClear = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.btnPickRandomMusic = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -108,36 +109,17 @@ namespace MusicManager.Views
             this.groupBox1.Controls.Add(this.tboxAlbum);
             this.groupBox1.Controls.Add(this.tboxTitle);
             this.groupBox1.Controls.Add(this.tboxArtist);
-            this.groupBox1.Location = new System.Drawing.Point(14, 88);
+            this.groupBox1.Location = new System.Drawing.Point(14, 95);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(260, 298);
+            this.groupBox1.Size = new System.Drawing.Size(260, 291);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Modify";
             // 
-            // lbMatching
-            // 
-            this.lbMatching.AutoEllipsis = true;
-            this.lbMatching.AutoSize = true;
-            this.lbMatching.Location = new System.Drawing.Point(86, 68);
-            this.lbMatching.Name = "lbMatching";
-            this.lbMatching.Size = new System.Drawing.Size(23, 12);
-            this.lbMatching.TabIndex = 4;
-            this.lbMatching.Text = "...";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 68);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(59, 12);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "Matching:";
-            // 
             // lbTitle
             // 
             this.lbTitle.AutoSize = true;
-            this.lbTitle.Location = new System.Drawing.Point(72, 105);
+            this.lbTitle.Location = new System.Drawing.Point(72, 51);
             this.lbTitle.Name = "lbTitle";
             this.lbTitle.Size = new System.Drawing.Size(113, 12);
             this.lbTitle.TabIndex = 3;
@@ -157,7 +139,7 @@ namespace MusicManager.Views
             // lbArtist
             // 
             this.lbArtist.AutoSize = true;
-            this.lbArtist.Location = new System.Drawing.Point(72, 51);
+            this.lbArtist.Location = new System.Drawing.Point(72, 104);
             this.lbArtist.Name = "lbArtist";
             this.lbArtist.Size = new System.Drawing.Size(119, 12);
             this.lbArtist.TabIndex = 3;
@@ -167,10 +149,10 @@ namespace MusicManager.Views
             // richTextBox1
             // 
             this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(6, 189);
+            this.richTextBox1.Location = new System.Drawing.Point(6, 193);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(248, 103);
+            this.richTextBox1.Size = new System.Drawing.Size(248, 99);
             this.richTextBox1.TabIndex = 2;
             this.richTextBox1.Text = " ** Tags which are selected above, will be replaced by the following algorithm:\n\n" +
     "(C#) Regex.Replace({source}, {source regex}, {tag regex})";
@@ -189,7 +171,7 @@ namespace MusicManager.Views
             // checkArtist
             // 
             this.checkArtist.AutoSize = true;
-            this.checkArtist.Location = new System.Drawing.Point(6, 22);
+            this.checkArtist.Location = new System.Drawing.Point(6, 75);
             this.checkArtist.Name = "checkArtist";
             this.checkArtist.Size = new System.Drawing.Size(60, 16);
             this.checkArtist.TabIndex = 0;
@@ -200,7 +182,7 @@ namespace MusicManager.Views
             // checkTitle
             // 
             this.checkTitle.AutoSize = true;
-            this.checkTitle.Location = new System.Drawing.Point(6, 76);
+            this.checkTitle.Location = new System.Drawing.Point(6, 22);
             this.checkTitle.Name = "checkTitle";
             this.checkTitle.Size = new System.Drawing.Size(54, 16);
             this.checkTitle.TabIndex = 0;
@@ -218,7 +200,7 @@ namespace MusicManager.Views
             // 
             // tboxTitle
             // 
-            this.tboxTitle.Location = new System.Drawing.Point(72, 74);
+            this.tboxTitle.Location = new System.Drawing.Point(72, 20);
             this.tboxTitle.Name = "tboxTitle";
             this.tboxTitle.Size = new System.Drawing.Size(182, 21);
             this.tboxTitle.TabIndex = 1;
@@ -226,11 +208,30 @@ namespace MusicManager.Views
             // 
             // tboxArtist
             // 
-            this.tboxArtist.Location = new System.Drawing.Point(72, 20);
+            this.tboxArtist.Location = new System.Drawing.Point(72, 73);
             this.tboxArtist.Name = "tboxArtist";
             this.tboxArtist.Size = new System.Drawing.Size(182, 21);
             this.tboxArtist.TabIndex = 1;
             this.tboxArtist.TextChanged += new System.EventHandler(this.tboxArtist_TextChanged);
+            // 
+            // lbMatching
+            // 
+            this.lbMatching.AutoEllipsis = true;
+            this.lbMatching.AutoSize = true;
+            this.lbMatching.Location = new System.Drawing.Point(86, 71);
+            this.lbMatching.Name = "lbMatching";
+            this.lbMatching.Size = new System.Drawing.Size(23, 12);
+            this.lbMatching.TabIndex = 4;
+            this.lbMatching.Text = "...";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 71);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(47, 12);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "Preview";
             // 
             // label2
             // 
@@ -295,9 +296,9 @@ namespace MusicManager.Views
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.rtboxLog);
-            this.groupBox2.Location = new System.Drawing.Point(280, 88);
+            this.groupBox2.Location = new System.Drawing.Point(280, 95);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(443, 298);
+            this.groupBox2.Size = new System.Drawing.Size(443, 291);
             this.groupBox2.TabIndex = 5;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Log";
@@ -310,7 +311,7 @@ namespace MusicManager.Views
             this.rtboxLog.Location = new System.Drawing.Point(6, 20);
             this.rtboxLog.Name = "rtboxLog";
             this.rtboxLog.ReadOnly = true;
-            this.rtboxLog.Size = new System.Drawing.Size(431, 272);
+            this.rtboxLog.Size = new System.Drawing.Size(431, 265);
             this.rtboxLog.TabIndex = 0;
             this.rtboxLog.Text = "";
             // 
@@ -361,6 +362,18 @@ namespace MusicManager.Views
             this.btnStop.UseVisualStyleBackColor = true;
             this.btnStop.Click += new System.EventHandler(this.btnStop_Click);
             // 
+            // btnPickRandomMusic
+            // 
+            this.btnPickRandomMusic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPickRandomMusic.Location = new System.Drawing.Point(648, 66);
+            this.btnPickRandomMusic.Name = "btnPickRandomMusic";
+            this.btnPickRandomMusic.Size = new System.Drawing.Size(75, 23);
+            this.btnPickRandomMusic.TabIndex = 2;
+            this.btnPickRandomMusic.Text = "Pick again";
+            this.toolTip1.SetToolTip(this.btnPickRandomMusic, "Pick one music randomly for previewing.");
+            this.btnPickRandomMusic.UseVisualStyleBackColor = true;
+            this.btnPickRandomMusic.Click += new System.EventHandler(this.btnPickRandomMusic_Click);
+            // 
             // FormTagsEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -376,6 +389,7 @@ namespace MusicManager.Views
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnTest);
+            this.Controls.Add(this.btnPickRandomMusic);
             this.Controls.Add(this.btnBrowse);
             this.Controls.Add(this.tboxRegex);
             this.Controls.Add(this.tboxFolder);
@@ -425,5 +439,6 @@ namespace MusicManager.Views
         private System.Windows.Forms.Label lbAlbum;
         private System.Windows.Forms.Label lbMatching;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnPickRandomMusic;
     }
 }
