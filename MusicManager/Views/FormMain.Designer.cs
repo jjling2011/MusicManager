@@ -49,6 +49,7 @@ namespace MusicManager.Views
             this.janitorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.detectSilentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeSilenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fixLyricsTagToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxMenuStripMore.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -193,28 +194,29 @@ namespace MusicManager.Views
             this.tagsEditorToolStripMenuItem,
             this.janitorToolStripMenuItem,
             this.detectSilentToolStripMenuItem,
-            this.removeSilenceToolStripMenuItem});
+            this.removeSilenceToolStripMenuItem,
+            this.fixLyricsTagToolStripMenuItem});
             this.ctxMenuStripMore.Name = "ctxMenuStripMore";
-            this.ctxMenuStripMore.Size = new System.Drawing.Size(164, 92);
+            this.ctxMenuStripMore.Size = new System.Drawing.Size(181, 136);
             // 
             // tagsEditorToolStripMenuItem
             // 
             this.tagsEditorToolStripMenuItem.Name = "tagsEditorToolStripMenuItem";
-            this.tagsEditorToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.tagsEditorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.tagsEditorToolStripMenuItem.Text = "tags editor";
             this.tagsEditorToolStripMenuItem.Click += new System.EventHandler(this.tagsEditorToolStripMenuItem_Click);
             // 
             // janitorToolStripMenuItem
             // 
             this.janitorToolStripMenuItem.Name = "janitorToolStripMenuItem";
-            this.janitorToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.janitorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.janitorToolStripMenuItem.Text = "janitor";
             this.janitorToolStripMenuItem.Click += new System.EventHandler(this.janitorToolStripMenuItem_Click);
             // 
             // detectSilentToolStripMenuItem
             // 
             this.detectSilentToolStripMenuItem.Name = "detectSilentToolStripMenuItem";
-            this.detectSilentToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.detectSilentToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.detectSilentToolStripMenuItem.Text = "detect silence";
             this.detectSilentToolStripMenuItem.ToolTipText = "Detect front + tail silence.";
             this.detectSilentToolStripMenuItem.Click += new System.EventHandler(this.detectSilentToolStripMenuItem_Click);
@@ -222,9 +224,17 @@ namespace MusicManager.Views
             // removeSilenceToolStripMenuItem
             // 
             this.removeSilenceToolStripMenuItem.Name = "removeSilenceToolStripMenuItem";
-            this.removeSilenceToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.removeSilenceToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.removeSilenceToolStripMenuItem.Text = "remove silence";
             this.removeSilenceToolStripMenuItem.Click += new System.EventHandler(this.removeSilenceToolStripMenuItem_Click);
+            // 
+            // fixLyricsTagToolStripMenuItem
+            // 
+            this.fixLyricsTagToolStripMenuItem.Name = "fixLyricsTagToolStripMenuItem";
+            this.fixLyricsTagToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.fixLyricsTagToolStripMenuItem.Text = "fix lyrics tag";
+            this.fixLyricsTagToolStripMenuItem.ToolTipText = "Remove language tag and merge offset.";
+            this.fixLyricsTagToolStripMenuItem.Click += new System.EventHandler(this.fixLyricsTagToolStripMenuItem_Click);
             // 
             // FormMain
             // 
@@ -273,6 +283,7 @@ namespace MusicManager.Views
         private System.Windows.Forms.ToolStripMenuItem janitorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem detectSilentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeSilenceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fixLyricsTagToolStripMenuItem;
     }
 }
 

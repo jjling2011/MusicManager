@@ -6,7 +6,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,7 +25,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.2.3";
+            this.Text = "Music manager v0.2.4";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -48,39 +50,36 @@ namespace MusicManager.Views
             }
         }
 
+        private void fixLyricsTagToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var msg = @"Fix <UNSYNCED LYRICS> in <id3v2.3> tags?";
+            var src = tboxSrcFolder.Text;
+            void job(CancellationToken token)
+            {
+                FixLyricsTag(src, token);
+            }
+            DoJob(job, msg);
+        }
+
         private void removeSilenceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!Utils.UI.Confirm("Remove head and tail silences of all musice?"))
-            {
-                return;
-            }
-
-            ToggleBtnState(false);
-
+            var msg = @"Remove head and tail silences of all musice?";
             var src = tboxSrcFolder.Text;
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-            Task.Run(() =>
+            void job(CancellationToken token)
             {
-                RemoveSilence(src, cts.Token);
-                ToggleBtnState(true);
-            });
+                RemoveSilence(src, token);
+            }
+            DoJob(job, msg);
         }
 
         private void detectSilentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ToggleBtnState(false);
-
             var src = tboxSrcFolder.Text;
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-            Task.Run(() =>
+            void job(CancellationToken token)
             {
-                DetectSilence(src, cts.Token);
-                ToggleBtnState(true);
-            });
+                DetectSilence(src, token);
+            }
+            DoJob(job, "");
         }
 
         private void btnMore_Click(object sender, EventArgs e)
@@ -145,34 +144,24 @@ namespace MusicManager.Views
 
         private void btnRename_Click(object sender, EventArgs e)
         {
-            ToggleBtnState(false);
-
             var src = tboxSrcFolder.Text;
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-            Task.Run(() =>
+            void job(CancellationToken token)
             {
-                RenameFolders(src, cts.Token);
-                ToggleBtnState(true);
-            });
+                RenameFolders(src, token);
+            }
+            DoJob(job, "");
         }
 
         private void btnDedup_Click(object sender, EventArgs e)
         {
-            ToggleBtnState(false);
-
             var src = tboxSrcFolder.Text;
             var dup = tboxDupFolder.Text;
 
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-
-            Task.Run(() =>
+            void job(CancellationToken token)
             {
-                DedupFolder(src, dup, cts.Token);
-                ToggleBtnState(true);
-            });
+                DedupFolder(src, dup, token);
+            }
+            DoJob(job, "");
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -235,10 +224,37 @@ namespace MusicManager.Views
             );
         }
 
+        void DoJob(Action<CancellationToken> action, string msg)
+        {
+            if (!string.IsNullOrEmpty(msg))
+            {
+                if (!Utils.UI.Confirm(msg))
+                {
+                    return;
+                }
+            }
+
+            ToggleBtnState(false);
+            cts?.Cancel();
+            cts = new CancellationTokenSource();
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    action(cts.Token);
+                }
+                catch (Exception ex)
+                {
+                    logger.Log($"error: {ex}");
+                }
+                ToggleBtnState(true);
+            });
+        }
+
         #endregion
 
         #region private
-
 
 
         Dictionary<string, string> musics = new Dictionary<string, string>();
@@ -260,19 +276,6 @@ namespace MusicManager.Views
                 musics.Add(key, file);
                 return string.Empty;
             }
-
-            /*
-            // keep old music file by timestamp
-            var dbFileTimestamp = new FileInfo(musics[key]).CreationTime;
-            var curFileTimestamp = new FileInfo(file).CreationTime;
-            if (dbFileTimestamp.CompareTo(curFileTimestamp) > 0)
-            {
-                var r = musics[key];
-                musics[key] = file;
-                logger.Log($"[dup] {r} of {file}");
-                return r;
-            }
-            */
 
             // keep old music file by search order
             logger.Log($"[dup] {file} of {musics[key]}");
@@ -361,6 +364,179 @@ namespace MusicManager.Views
             logger.Log($"[mv] {src} -> {dest}");
             File.Move(src, dest);
             return true;
+        }
+
+        bool TryGetOffset(string s, out int ms)
+        {
+            ms = 0;
+            if (!s.Contains("[offset:"))
+            {
+                return false;
+            }
+            var pat = @"\[offset:([+\-]?\d+)\]";
+            try
+            {
+                var match = Regex.Match(s, pat);
+                if (match.Success)
+                {
+                    var value = match.Groups[1].ToString();
+                    if (int.TryParse(value, out ms))
+                    {
+                        if (ms > 9 || ms < -9)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        bool TryFixOneLineOfLyric(string line, int offset, out string newLine)
+        {
+            newLine = null;
+            if (offset < 10 && offset > -10)
+            {
+                return false;
+            }
+
+            var pattern = @"^\[(\d+):(\d\d)\.(\d\d)\](.*)$";
+            try
+            {
+                var match = Regex.Match(line, pattern);
+                if (!match.Success)
+                {
+                    return false;
+                }
+                var remain = match.Groups[4].ToString();
+                if (!int.TryParse(match.Groups[1].ToString(), out int minutes))
+                {
+                    return false;
+                }
+                if (!int.TryParse(match.Groups[2].ToString(), out int seconds))
+                {
+                    return false;
+                }
+                if (!int.TryParse(match.Groups[3].ToString(), out int hs))
+                {
+                    return false;
+                }
+                var ms = (minutes * 60 + seconds) * 1000 + hs * 10 - offset;
+                ms = ms < 0 ? 0 : ms;
+                hs = (ms / 10) % 100;
+                seconds = (ms / 1000) % 60;
+                minutes = (ms / 1000 / 60);
+                newLine = $"[{minutes:D2}:{seconds:D2}.{hs:D2}]{remain}";
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        readonly HashSet<string> lineFilters = new HashSet<string>()
+        {
+            "﻿[id:",
+            "[hash:",
+            "[length:",
+            "[total:",
+            "[language:"
+        };
+
+        bool IsFilteredLine(string line)
+        {
+            foreach (var item in lineFilters)
+            {
+                if (line.StartsWith(item))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        string FixLyrics(string lyric)
+        {
+            var sb = new StringBuilder();
+            var offset = 0;
+
+            var lines = lyric.Replace("\r", "").Split('\n');
+            foreach (var line in lines)
+            {
+                if (line == null)
+                {
+                    continue;
+                }
+                var lower = line.ToLower();
+                if (IsFilteredLine(lower))
+                {
+                    continue;
+                }
+                if (TryGetOffset(lower, out int ms))
+                {
+                    offset = ms;
+                    sb.AppendLine("[offset:0]");
+                    continue;
+                }
+                if (TryFixOneLineOfLyric(line, offset, out string newLine))
+                {
+                    sb.AppendLine(newLine);
+                    continue;
+                }
+                sb.AppendLine(line);
+            }
+            var s = sb.ToString().TrimEnd('\r', '\n');
+            return s;
+        }
+
+        void FixLyricsTag(string sources, CancellationToken token)
+        {
+            var cFixed = 0;
+            var cSkip = 0;
+            var cNonMusic = 0;
+            bool job(int idx, string file, CancellationToken tk)
+            {
+                if (!Utils.Tools.IsMusicFile(file))
+                {
+                    cNonMusic++;
+                    return true;
+                }
+
+                var music = TagLib.File.Create(file);
+                var lyrics = music.Tag.Lyrics;
+                if (string.IsNullOrEmpty(lyrics))
+                {
+                    // logger.Log($"<debug> <empty lyric> [{idx}] {file}");
+                    cSkip++;
+                    return true;
+                }
+
+                var newLyrics = FixLyrics(lyrics);
+                if (lyrics != newLyrics)
+                {
+                    logger.Log($"[fix] {file}");
+
+                    // lyric will store in tag "UNSYNCED LYRICS"
+                    music.Tag.Lyrics = ""; // clear old lyrics
+                    music.Tag.Lyrics = newLyrics; // append lyrics
+
+                    music.Save();
+                    cFixed++;
+                }
+                else
+                {
+                    cSkip++;
+                }
+                return true;
+            }
+
+            logger.Log("fixing lyrics tag");
+            Utils.Tools.ProcessFolders(logger, sources, job, token);
+            logger.Log(
+                $"total: {cFixed + cSkip + cNonMusic} modify: {cFixed} skip: {cSkip} non-music: {cNonMusic}"
+            );
         }
 
         void RemoveSilence(string sources, CancellationToken token)

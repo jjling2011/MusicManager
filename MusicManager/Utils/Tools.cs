@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MusicManager.Comps;
 
@@ -130,6 +131,49 @@ namespace MusicManager.Utils
         {
             var ext = Path.GetExtension(file).ToLower();
             return musicExtensions.Contains(ext);
+        }
+
+        public static void ProcessFolders(
+            Logger logger,
+            string sources,
+            Func<int, string, CancellationToken, bool> action,
+            CancellationToken token
+        )
+        {
+            if (action == null)
+            {
+                logger.Log("error: empty action!");
+                return;
+            }
+
+            var c = 0;
+            var folders = SplitFolders(sources);
+            foreach (var folder in folders)
+            {
+                if (!Directory.Exists(folder))
+                {
+                    logger.Log($"Dir not exists: {folder}");
+                    continue;
+                }
+                foreach (
+                    string file in Directory.EnumerateFiles(
+                        folder,
+                        "*.*",
+                        SearchOption.AllDirectories
+                    )
+                )
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        logger.Log("Stop by user");
+                        return;
+                    }
+                    if (!action(c++, file, token))
+                    {
+                        return;
+                    }
+                }
+            }
         }
     }
 }
