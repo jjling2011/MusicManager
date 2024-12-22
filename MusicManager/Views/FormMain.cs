@@ -17,7 +17,9 @@ namespace MusicManager.Views
 {
     public partial class FormMain : Form
     {
-        readonly int MAX_TOTAL_SILENCE = 1000; // ms
+        readonly int MAX_END_SILENCE = 200; // ms
+        readonly int MAX_HEAD_SILENCE = 1000; // ms
+
         CancellationTokenSource cts;
         readonly Comps.Logger logger = null;
 
@@ -25,7 +27,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.2.4";
+            this.Text = "Music manager v0.2.5";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -442,7 +444,7 @@ namespace MusicManager.Views
             "[hash:",
             "[length:",
             "[total:",
-            "[language:"
+            "[language:",
         };
 
         bool IsFilteredLine(string line)
@@ -539,6 +541,15 @@ namespace MusicManager.Views
             );
         }
 
+        bool NeedToCutMusic(int head, int end)
+        {
+            if (end <= MAX_END_SILENCE + 300 && head <= MAX_HEAD_SILENCE + 200)
+            {
+                return false;
+            }
+            return true;
+        }
+
         void RemoveSilence(string sources, CancellationToken token)
         {
             if (!Utils.Tools.IsFfmpegExists())
@@ -586,22 +597,37 @@ namespace MusicManager.Views
 
                     cTotal++;
                     var info = Comps.SilenceDetector.GetSilenceInfos(file);
-                    var totalSilence = info.GetTotalSilenceMs();
-                    if (info == null || totalSilence < MAX_TOTAL_SILENCE)
+                    if (info == null)
                     {
-                        logger.Log($"[skip] #{cTotal} silence: {totalSilence}ms file: {file}");
+                        logger.Log($"[error] #{cTotal} read music file info fail");
+                        continue;
+                    }
+                    var total = info.GetTotalSilenceMs();
+                    var head = info.GetStartSilenceMs();
+                    var end = info.GetEndSilenceMs();
+
+                    if (!NeedToCutMusic(head, end))
+                    {
+                        logger.Log($"[skip] #{cTotal} silence: {total}ms file: {file}");
                         continue;
                     }
 
-                    logger.Log($"[cut ] #{cTotal} silence: {totalSilence}ms file: {file}");
-                    var ss = 1.0 * info.GetStartSilenceMs() / 1000;
+                    logger.Log($"[cut ] #{cTotal} silence: {total}ms file: {file}");
+                    var ss = 1.0 * head / 1000;
                     var t = 1.0 * info.GetVolumeDurationMs() / 1000;
-                    var tail = 1.0 * info.GetEndSilenceMs() / 1000;
+                    var tail = 1.0 * end / 1000;
+
+                    var cut_ss = 1.0 * Math.Max(head - MAX_HEAD_SILENCE, 0) / 1000;
+                    var cut_tail = 1.0 * Math.Min(end, MAX_END_SILENCE) / 1000;
+
                     logger.Log(
-                        $"start: {ss}s tail: {tail}s duration: {t}s total: {ss + t + tail}s"
+                        $"before: {ss}s tail: {tail}s duration: {t}s total: {ss + t + tail}s"
+                    );
+                    logger.Log(
+                        $"after : {cut_ss}s tail: {cut_tail}s duration: {t}s total: {cut_ss + t + cut_tail}s"
                     );
 
-                    if (Utils.Tools.RemoveSilence(logger, file, ss, t))
+                    if (Utils.Tools.RemoveSilence(logger, file, cut_ss, cut_tail + t))
                     {
                         logger.Log($"result: success");
                         cOk++;
@@ -656,7 +682,10 @@ namespace MusicManager.Views
                     }
                     cTotal++;
                     var info = Comps.SilenceDetector.GetSilenceInfos(file);
-                    if (info != null && info.GetTotalSilenceMs() > MAX_TOTAL_SILENCE)
+                    if (
+                        info != null
+                        && NeedToCutMusic(info.GetStartSilenceMs(), info.GetEndSilenceMs())
+                    )
                     {
                         cSilence++;
                         var head = 1.0 * info.GetStartSilenceMs() / 1000;
