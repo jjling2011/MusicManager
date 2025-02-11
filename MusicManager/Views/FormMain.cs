@@ -19,6 +19,7 @@ namespace MusicManager.Views
     {
         readonly int MAX_END_SILENCE = 200; // ms
         readonly int MAX_HEAD_SILENCE = 1000; // ms
+        readonly int ADD_SILENCE_LEN = 2000; // add 2 seconds of siclence both in the front and at the end
 
         CancellationTokenSource cts;
         readonly Comps.Logger logger = null;
@@ -27,7 +28,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.2.5";
+            this.Text = "Music manager v0.2.4.1";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -59,6 +60,17 @@ namespace MusicManager.Views
             void job(CancellationToken token)
             {
                 FixLyricsTag(src, token);
+            }
+            DoJob(job, msg);
+        }
+
+        private void addSilenceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var msg = $"Add {ADD_SILENCE_LEN}ms of silences both in the beginning and at the end?";
+            var src = tboxSrcFolder.Text;
+            void job(CancellationToken token)
+            {
+                AddSilence(src, token);
             }
             DoJob(job, msg);
         }
@@ -548,6 +560,74 @@ namespace MusicManager.Views
                 return false;
             }
             return true;
+        }
+
+        void AddSilence(string sources, CancellationToken token)
+        {
+            if (!Utils.Tools.IsFfmpegExists())
+            {
+                logger.Log($"\"{Utils.Tools.ffmpeg_exe}\" not found!");
+                logger.Log($"please download ffmpeg.exe to \"tools\" folder");
+                return;
+            }
+
+            Utils.Tools.CreateTempDir();
+
+            var cOk = 0;
+            var cFail = 0;
+            var cTotal = 0;
+            var ss = 1.0 * ADD_SILENCE_LEN / 1000;
+
+            var folders = Utils.Tools.SplitFolders(sources);
+            foreach (var folder in folders)
+            {
+                if (!Directory.Exists(folder))
+                {
+                    logger.Log($"Dir not exists: {folder}");
+                    continue;
+                }
+
+                logger.Log($"Processing folder: {folder}");
+                var musics = new List<string>();
+                foreach (
+                    string file in Directory.EnumerateFiles(
+                        folder,
+                        "*.*",
+                        SearchOption.AllDirectories
+                    )
+                )
+                {
+                    if (token.IsCancellationRequested)
+                    {
+                        logger.Log("Stop by user");
+                        goto labelEscape;
+                    }
+
+                    if (!Utils.Tools.IsMusicFile(file))
+                    {
+                        continue;
+                    }
+
+                    cTotal++;
+                    logger.Log($"[{cTotal}] {file}");
+
+                    if (Utils.Tools.AddSilence(logger, file, ss))
+                    {
+                        logger.Log($"result: success");
+                        cOk++;
+                    }
+                    else
+                    {
+                        logger.Log($"result: fail");
+                        cFail++;
+                    }
+                }
+            }
+
+            labelEscape:
+            logger.Log(
+                $"Total: {cTotal} Success: {cOk} Fail: {cFail} Skip: {cTotal - cOk - cFail}"
+            );
         }
 
         void RemoveSilence(string sources, CancellationToken token)

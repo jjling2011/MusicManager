@@ -16,7 +16,7 @@ namespace MusicManager.Utils
             @"aa, aax, aac, aiff, ape, dsf, flac, m4a, m4b, m4p, mp3, mpc, mpp, ogg, oga, wav, wma, wv, webm";
         static HashSet<string> musicExtensions = new HashSet<string>();
 
-        static HashSet<string> lrcExtensions = new HashSet<string>() { ".lrc", };
+        static HashSet<string> lrcExtensions = new HashSet<string>() { ".lrc" };
 
         static Tools()
         {
@@ -41,6 +41,38 @@ namespace MusicManager.Utils
         public static bool IsFfmpegExists()
         {
             return File.Exists(ffmpeg_exe);
+        }
+
+        public static bool AddSilence(Logger logger, string path, double s)
+        {
+            var filename = Path.GetFileName(path);
+            var tmpdir = Path.Combine(temp_dir, filename);
+
+            // beginning 3s end 1s
+            // ffmpeg.exe -i input.mp3 -af apad=pad_dur=1s,areverse,apad=pad_dur=3s,areverse output.mp3
+            var args =
+                $"-i \"{path}\" -af apad=pad_dur={s}s,areverse,apad=pad_dur={s}s,areverse \"{tmpdir}\"";
+
+            var ps = new Process()
+            {
+                StartInfo = new ProcessStartInfo()
+                {
+                    FileName = ffmpeg_exe,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                },
+            };
+
+            ps.Start();
+            ps.WaitForExit();
+            if (ps.ExitCode == 0)
+            {
+                var dir = Path.GetDirectoryName(path);
+                MoveFileToFolder(logger, tmpdir, dir);
+                return true;
+            }
+            return false;
         }
 
         public static bool RemoveSilence(Logger logger, string path, double ss, double t)
