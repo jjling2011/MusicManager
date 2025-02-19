@@ -235,7 +235,7 @@ namespace MusicManager.Views
             this.addSilenceToolStripMenuItem.Name = "addSilenceToolStripMenuItem";
             this.addSilenceToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addSilenceToolStripMenuItem.Text = "add silence";
-            this.addSilenceToolStripMenuItem.ToolTipText = "add silce in the beginning and at the end";
+            this.addSilenceToolStripMenuItem.ToolTipText = "add silence in the beginning and at the end";
             this.addSilenceToolStripMenuItem.Click += new System.EventHandler(this.addSilenceToolStripMenuItem_Click);
             // 
             // fixLyricsTagToolStripMenuItem

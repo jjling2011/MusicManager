@@ -17,8 +17,8 @@ namespace MusicManager.Views
 {
     public partial class FormMain : Form
     {
-        readonly int MAX_END_SILENCE = 200; // ms
-        readonly int MAX_HEAD_SILENCE = 1000; // ms
+        readonly int MAX_END_SILENCE = 800; // ms
+        readonly int MAX_HEAD_SILENCE = 800; // ms
         readonly int ADD_SILENCE_LEN = 2000; // add 2 seconds of siclence both in the front and at the end
 
         CancellationTokenSource cts;
@@ -28,7 +28,7 @@ namespace MusicManager.Views
         {
             InitializeComponent();
 
-            this.Text = "Music manager v0.2.4.1";
+            this.Text = "Music manager v0.2.4.2";
 
             tboxSrcFolder.Text = Properties.Settings.Default.srcFolder;
             tboxDupFolder.Text = Properties.Settings.Default.dupFolder;
@@ -77,7 +77,8 @@ namespace MusicManager.Views
 
         private void removeSilenceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var msg = @"Remove head and tail silences of all musice?";
+            var msg =
+                $"Keep {MAX_HEAD_SILENCE}ms head and {MAX_END_SILENCE}ms tail silences of all musice?";
             var src = tboxSrcFolder.Text;
             void job(CancellationToken token)
             {
@@ -232,8 +233,7 @@ namespace MusicManager.Views
                     {
                         btnDedup.Enabled = isEnable;
                         btnRename.Enabled = isEnable;
-                        removeSilenceToolStripMenuItem.Enabled = isEnable;
-                        detectSilentToolStripMenuItem.Enabled = isEnable;
+                        btnMore.Enabled = isEnable;
                     }
             );
         }
@@ -555,7 +555,7 @@ namespace MusicManager.Views
 
         bool NeedToCutMusic(int head, int end)
         {
-            if (end <= MAX_END_SILENCE + 300 && head <= MAX_HEAD_SILENCE + 200)
+            if (end <= MAX_END_SILENCE + 200 && head <= MAX_HEAD_SILENCE + 200)
             {
                 return false;
             }
@@ -698,16 +698,18 @@ namespace MusicManager.Views
                     var tail = 1.0 * end / 1000;
 
                     var cut_ss = 1.0 * Math.Max(head - MAX_HEAD_SILENCE, 0) / 1000;
-                    var cut_tail = 1.0 * Math.Min(end, MAX_END_SILENCE) / 1000;
+                    var keep_head = ss - cut_ss;
+                    var keep_tail = 1.0 * Math.Min(end, MAX_END_SILENCE) / 1000;
+                    var len = keep_head + t + keep_tail;
 
                     logger.Log(
                         $"before: {ss}s tail: {tail}s duration: {t}s total: {ss + t + tail}s"
                     );
                     logger.Log(
-                        $"after : {cut_ss}s tail: {cut_tail}s duration: {t}s total: {cut_ss + t + cut_tail}s"
+                        $"after : {keep_head}s tail: {keep_tail}s duration: {t}s total: {len}s"
                     );
 
-                    if (Utils.Tools.RemoveSilence(logger, file, cut_ss, cut_tail + t))
+                    if (Utils.Tools.RemoveSilence(logger, file, cut_ss, len))
                     {
                         logger.Log($"result: success");
                         cOk++;
